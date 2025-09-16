@@ -7,7 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -76,28 +76,10 @@ public final class PokeballItemFactory {
         stack.setItemMeta(meta);
     }
 
-    public void markCapturedFromEntity(ItemStack stack, Entity entity, boolean bypass, String bypassAnnotation) {
-        ItemMeta meta = stack.getItemMeta();
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        EntityType type = entity.getType();
-        pdc.set(Keys.CAPTURED_TYPE, PersistentDataType.STRING, type.name());
-        // Basic attributes
-        if (entity instanceof Ageable ageable) {
-            pdc.set(Keys.CAPTURED_IS_BABY, PersistentDataType.BYTE, (byte)(ageable.isAdult() ? 0 : 1));
-        }
-        if (entity instanceof Sheep sheep) {
-            pdc.set(Keys.CAPTURED_VARIANT, PersistentDataType.STRING, sheep.getColor().name());
-        }
-        applyCommonMeta(meta, cfg.itemName(), cfg.itemLore(), type, (bypass && bypassAnnotation != null) ? bypassAnnotation : null);
-        stack.setItemMeta(meta);
-    }
-
     public void clearCaptured(ItemStack stack) {
         ItemMeta meta = stack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.remove(Keys.CAPTURED_TYPE);
-        pdc.remove(Keys.CAPTURED_IS_BABY);
-        pdc.remove(Keys.CAPTURED_VARIANT);
         applyCommonMeta(meta, cfg.itemName(), cfg.itemLore(), null, null);
         stack.setItemMeta(meta);
     }
@@ -112,7 +94,7 @@ public final class PokeballItemFactory {
         meta.displayName(display);
         java.util.ArrayList<Component> loreLines = new java.util.ArrayList<>();
         if (lore != null && !lore.isEmpty()) loreLines.addAll(lore.stream().map(mini::deserialize).toList());
-        loreLines.add(mini.deserialize(captured == null ? "<gray>Contents: <red>Empty</red></gray>" : "<gray>Status: <green>Filled</green> (<yellow>" + captured.name() + "</yellow>)</gray>"));
+        loreLines.add(mini.deserialize(captured == null ? "<gray>Contents: <red>Empty</red></gray>" : "<gray>Contents: <green>" + captured.name() + "</green></gray>"));
         if (extraAnnotation != null && !extraAnnotation.isEmpty()) {
             loreLines.add(mini.deserialize(extraAnnotation));
         }

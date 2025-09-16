@@ -2,7 +2,7 @@
 item:
   name: "<yellow>Pokeball"
   lore:
-    - "<gray>You know what to do with it."
+    - "<gray>You know what to do with it, nothing stupid hopefully."
   custom-model-data: ~
 
 # Capture rules
@@ -47,6 +47,7 @@ messages:
   prefix: "<gray>[<yellow>Pokeball</yellow>]"
   capture-success: "<green>Captured a <yellow><type></yellow>!"
   capture-fail-blocked: "<red>You cannot capture that mob."
+  capture-fail-player: "<yellow>Really?</yellow>"
   capture-fail-invalid: "<red>Use a Pokeball on a valid mob."
   capture-fail-permission: "<red>You lack permission to capture."
   capture-fail-world: "<red>Capturing is not allowed in this world."
@@ -56,3 +57,47 @@ messages:
   release-fail-world: "<red>Releasing is not allowed in this world."
   given: "<green>Gave <yellow><count></yellow> Pokeball(s) to <yellow><player></yellow>."
   reloaded: "<green>Configuration reloaded."
+
+# Stasis settings: move captured mobs to a safe stash location immediately to avoid
+# collisions/visuals near the capture point. On release, we teleport from the stash
+# to the target location while invisible, then restore visibility a tick later.
+stasis:
+  enabled: true
+  world: world
+  x: 0.0
+  y: 320.0
+  z: 0.0
+  cap:
+    enabled: false
+    max-total: 500
+
+effects:
+  flight:
+    enabled: true
+    glow: true
+    tick-period: 1
+    dust: true
+    dust-size: 0.9
+    dust-count: 1
+    end-rod: true
+    end-rod-points: 2
+    end-rod-step: 0.15
+  capture:
+    particles: true
+    particle: FANCY
+    particle-count: 25
+    sound: entity.evoker.prepare_attack
+    volume: 1.0
+    pitch: 1.3
+  release:
+    particles: true
+    particle: FANCY
+    particle-count: 30
+    sound: entity.illusioner.cast_spell
+    volume: 1.0
+    pitch: 1.0
+
+release:
+  offset-normal: 0.31
+  offset-up: 0.05
+  probe-max-steps: 3

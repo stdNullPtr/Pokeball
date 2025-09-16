@@ -10,8 +10,7 @@ public final class Keys {
     public static NamespacedKey CAPTURED_TYPE;
     public static NamespacedKey CAPTURED_DATA_VERSION;
     public static NamespacedKey PROJECTILE_BALL;
-    public static NamespacedKey CAPTURED_IS_BABY;
-    public static NamespacedKey CAPTURED_VARIANT;
+    public static NamespacedKey PROJECTILE_RELEASE_ID;
 
     private Keys() { }
 
@@ -21,8 +20,7 @@ public final class Keys {
         CAPTURED_TYPE = key("captured_type");
         CAPTURED_DATA_VERSION = key("captured_data_version");
         PROJECTILE_BALL = key("projectile_ball");
-        CAPTURED_IS_BABY = key("captured_is_baby");
-        CAPTURED_VARIANT = key("captured_variant");
+        PROJECTILE_RELEASE_ID = key("projectile_release_id");
     }
 
     private static NamespacedKey key(String path) {

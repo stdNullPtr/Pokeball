@@ -27,3 +27,6 @@ permissions:
   pokeball.bypass.creative:
     description: Allow creative-mode bypass of capture restrictions
     default: op
+  pokeball.admin:
+    description: Access to admin subcommands (list/tp/clean/cap)
+    default: op
