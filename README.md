@@ -29,6 +29,7 @@ Pokeball lets you “catch” a mob in a ball and “throw” it back out, just 
 
 ## How You Use It (Admins)
 
+- Get help: `/pokeball help` (shows only what you can use)
 - Give balls to players: `/pokeball give <player> [amount]`
 - Reload config: `/pokeball reload`
 - Manage storage:
@@ -36,6 +37,11 @@ Pokeball lets you “catch” a mob in a ball and “throw” it back out, just 
   - `/pokeball admin tp <id>` — teleport to a stored entry location (for inspection)
   - `/pokeball admin clean <id|all>` — remove one/all stored entries
   - `/pokeball admin cap get|set <enabled> <max>` — view or change storage cap
+  - `/pokeball admin refund get|set <GIVE|DROP>` — set refund behavior (see below)
+
+Notes:
+- Commands are registered using Paper’s Brigadier API with typed arguments and tab-completion.
+- Player arguments use native selectors and client-side suggestions; integers/booleans are validated client-side.
 
 ## What It Looks Like
 
@@ -53,3 +59,10 @@ Pokeball lets you “catch” a mob in a ball and “throw” it back out, just 
 - Release positioning is smart:
   - When you hit a wall, the mob appears just outside it (not inside)
   - You can tweak how far from the wall and how many blocks to probe
+
+### Refund Behavior
+
+- Config key: `refund.mode: GIVE|DROP`
+  - `GIVE`: tries to return balls to the player inventory; if full, drops at the impact location.
+  - `DROP`: always drops balls at the impact location.
+- Live control (ops): `/pokeball admin refund get|set <GIVE|DROP>`

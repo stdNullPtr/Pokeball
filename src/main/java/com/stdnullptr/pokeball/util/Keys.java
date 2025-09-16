@@ -1,29 +1,30 @@
 package com.stdnullptr.pokeball.util;
 
+import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
+@Getter
 public final class Keys {
-    private static Plugin plugin;
+    private final NamespacedKey ballId;
 
-    public static NamespacedKey BALL_ID;
-    public static NamespacedKey CAPTURED_TYPE;
-    public static NamespacedKey CAPTURED_DATA_VERSION;
-    public static NamespacedKey PROJECTILE_BALL;
-    public static NamespacedKey PROJECTILE_RELEASE_ID;
+    private final NamespacedKey capturedType;
 
-    private Keys() { }
+    private final NamespacedKey capturedDataVersion;
 
-    public static void init(Plugin p) {
-        plugin = p;
-        BALL_ID = key("ball_id");
-        CAPTURED_TYPE = key("captured_type");
-        CAPTURED_DATA_VERSION = key("captured_data_version");
-        PROJECTILE_BALL = key("projectile_ball");
-        PROJECTILE_RELEASE_ID = key("projectile_release_id");
+    private final NamespacedKey projectileBall;
+
+    private final NamespacedKey projectileReleaseId;
+
+    public Keys(final Plugin plugin) {
+        this.ballId = key(plugin, "ball_id");
+        this.capturedType = key(plugin, "captured_type");
+        this.capturedDataVersion = key(plugin, "captured_data_version");
+        this.projectileBall = key(plugin, "projectile_ball");
+        this.projectileReleaseId = key(plugin, "projectile_release_id");
     }
 
-    private static NamespacedKey key(String path) {
+    private static NamespacedKey key(final Plugin plugin, final String path) {
         return new NamespacedKey(plugin, path);
     }
 }

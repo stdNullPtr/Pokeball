@@ -1,4 +1,6 @@
 # Display
+# Name and lore are MiniMessage strings.
+# 'custom-model-data' can be an integer or null (~) if you don't use a resource pack.
 item:
   name: "<yellow>Pokeball"
   lore:
@@ -6,6 +8,8 @@ item:
   custom-model-data: ~
 
 # Capture rules
+# 'allowed-entity-types' is a strict allowlist. Use Bukkit EntityType names (e.g., COW, SHEEP, ZOMBIE).
+# Anything not listed is blocked (unless admin creative bypass applies).
 capture:
   allowed-entity-types:
     - COW
@@ -22,9 +26,13 @@ capture:
     - FOX
     - TURTLE
     - BEE
+  # If true, releasing consumes the Pokeball; if false, the ball is returned (see refund.mode below).
   consume-on-release: false
 
 # Creative bypass
+# When enabled, ops (or those with the bypass permission) in creative can capture any entity even if not on the allowlist.
+# 'permission' is the node to check (set to blank to allow all creative players).
+# If 'annotate' is true, add a lore line to mark bypass captures.
 creative-bypass:
   enabled: true
   permission: pokeball.bypass.creative
@@ -48,11 +56,8 @@ messages:
   capture-success: "<green>Captured a <yellow><type></yellow>!"
   capture-fail-blocked: "<red>You cannot capture that mob."
   capture-fail-player: "<yellow>Really?</yellow>"
-  capture-fail-invalid: "<red>Use a Pokeball on a valid mob."
-  capture-fail-permission: "<red>You lack permission to capture."
   capture-fail-world: "<red>Capturing is not allowed in this world."
   release-success: "<green>Released a <yellow><type></yellow>."
-  release-fail-empty: "<red>This Pokeball is empty."
   release-fail-permission: "<red>You lack permission to release."
   release-fail-world: "<red>Releasing is not allowed in this world."
   given: "<green>Gave <yellow><count></yellow> Pokeball(s) to <yellow><player></yellow>."
@@ -62,16 +67,18 @@ messages:
 # collisions/visuals near the capture point. On release, we teleport from the stash
 # to the target location while invisible, then restore visibility a tick later.
 stasis:
-  enabled: true
   world: world
   x: 0.0
   y: 320.0
   z: 0.0
   cap:
+    # Enable a soft cap for total stasis entries; further captures are refused.
     enabled: false
+    # Maximum number of stored entries when cap is enabled (positive integer).
     max-total: 500
 
 effects:
+  # Flight trail while the ball travels.
   flight:
     enabled: true
     glow: true
@@ -82,6 +89,7 @@ effects:
     end-rod: true
     end-rod-points: 2
     end-rod-step: 0.15
+  # Capture effects at the impact point. 'particle' can be a Bukkit Particle name (e.g., CLOUD, CRIT) or 'FANCY' preset.
   capture:
     particles: true
     particle: FANCY
@@ -89,6 +97,7 @@ effects:
     sound: entity.evoker.prepare_attack
     volume: 1.0
     pitch: 1.3
+  # Release effects at the spawn location. 'particle' can be a Bukkit Particle name (e.g., END_ROD) or 'FANCY' preset.
   release:
     particles: true
     particle: FANCY
@@ -98,6 +107,15 @@ effects:
     pitch: 1.0
 
 release:
+  # Placement tuning when releasing at a wall: how far out from the impact normal and how much upward offset.
   offset-normal: 0.31
   offset-up: 0.05
   probe-max-steps: 3
+
+# Refund behavior after throws
+# When a ball should be returned to the player (e.g., on miss, failed capture, release refund),
+# choose whether to GIVE it back to the inventory or DROP it on the ground at the impact point.
+# If the inventory is full, the ball will always drop regardless of this setting.
+refund:
+  # Allowed values: GIVE or DROP
+  mode: GIVE

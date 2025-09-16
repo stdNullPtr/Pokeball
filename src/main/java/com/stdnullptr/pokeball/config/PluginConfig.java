@@ -1,7 +1,5 @@
 package com.stdnullptr.pokeball.config;
 
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 
 public final class PluginConfig {
     private final Plugin plugin;
-    private final MiniMessage mini = MiniMessage.miniMessage();
 
     private String itemName;
     private List<String> itemLore;
@@ -23,7 +20,6 @@ public final class PluginConfig {
     private String creativeBypassPermission;
     private boolean creativeBypassAnnotate;
     private String creativeBypassAnnotation;
-    private boolean stasisEnabled;
     private String stasisWorld;
     private double stasisX;
     private double stasisY;
@@ -60,33 +56,30 @@ public final class PluginConfig {
     private Set<String> allowedWorlds;
     private Set<EntityType> allowedTypes;
 
+    private RefundMode refundMode;
+
+    public PluginConfig(final Plugin plugin) {
+        this.plugin = plugin;
+        reload();
+    }
+
     // Messages
     public String msgPrefix;
     public String msgCaptureSuccess;
     public String msgCaptureFailBlocked;
     public String msgCaptureFailPlayer;
-    public String msgCaptureFailInvalid;
-    public String msgCaptureFailPermission;
     public String msgCaptureFailWorld;
     public String msgReleaseSuccess;
-    public String msgReleaseFailEmpty;
-    public String msgReleaseFailPermission;
-    public String msgReleaseFailWorld;
     public String msgGiven;
     public String msgReloaded;
 
-    public PluginConfig(Plugin plugin) {
-        this.plugin = plugin;
-        reload();
-    }
-
     public void reload() {
         plugin.reloadConfig();
-        FileConfiguration c = plugin.getConfig();
+        final FileConfiguration c = plugin.getConfig();
 
         this.itemName = c.getString("item.name", "<yellow>Pokeball");
         this.itemLore = c.getStringList("item.lore");
-        this.customModelData = c.get("item.custom-model-data") instanceof Number n ? n.intValue() : null;
+        this.customModelData = c.get("item.custom-model-data") instanceof final Number n ? n.intValue() : null;
 
         this.consumeOnRelease = c.getBoolean("capture.consume-on-release", false);
 
@@ -104,17 +97,11 @@ public final class PluginConfig {
         this.msgCaptureSuccess = c.getString("messages.capture-success", "<green>Captured a <yellow><type></yellow>!");
         this.msgCaptureFailBlocked = c.getString("messages.capture-fail-blocked", "<red>You cannot capture that mob.");
         this.msgCaptureFailPlayer = c.getString("messages.capture-fail-player", "<yellow>Really?</yellow>");
-        this.msgCaptureFailInvalid = c.getString("messages.capture-fail-invalid", "<red>Use a Pokeball on a valid mob.");
-        this.msgCaptureFailPermission = c.getString("messages.capture-fail-permission", "<red>You lack permission to capture.");
         this.msgCaptureFailWorld = c.getString("messages.capture-fail-world", "<red>Capturing is not allowed in this world.");
         this.msgReleaseSuccess = c.getString("messages.release-success", "<green>Released a <yellow><type></yellow>.");
-        this.msgReleaseFailEmpty = c.getString("messages.release-fail-empty", "<red>This Pokeball is empty.");
-        this.msgReleaseFailPermission = c.getString("messages.release-fail-permission", "<red>You lack permission to release.");
-        this.msgReleaseFailWorld = c.getString("messages.release-fail-world", "<red>Releasing is not allowed in this world.");
         this.msgGiven = c.getString("messages.given", "<green>Gave <yellow><count></yellow> Pokeball(s) to <yellow><player></yellow>.");
         this.msgReloaded = c.getString("messages.reloaded", "<green>Configuration reloaded.");
 
-        this.stasisEnabled = c.getBoolean("stasis.enabled", true);
         this.stasisWorld = c.getString("stasis.world", "world");
         this.stasisX = c.getDouble("stasis.x", 0.0);
         this.stasisY = c.getDouble("stasis.y", 320.0);
@@ -124,19 +111,35 @@ public final class PluginConfig {
 
         this.captureEffect = readEffect(c, "effects.capture");
         this.releaseEffect = readEffect(c, "effects.release");
-        this.flightSpec = readFlight(c, "effects.flight");
+        this.flightSpec = readFlight(c);
         this.releaseOffsetNormal = c.getDouble("release.offset-normal", 0.31);
         this.releaseOffsetUp = c.getDouble("release.offset-up", 0.05);
         this.releaseProbeSteps = Math.max(1, c.getInt("release.probe-max-steps", 3));
+
+        // Refund behavior
+        final String refund = c.getString("refund.mode", "GIVE");
+        RefundMode mode;
+        try {
+            mode = RefundMode.valueOf(refund.toUpperCase());
+        } catch (final Exception e) {
+            mode = RefundMode.GIVE;
+        }
+        this.refundMode = mode;
     }
 
-    private EntityType toEntityType(String name) {
+    private EntityType toEntityType(final String name) {
         try {
             return EntityType.valueOf(name);
-        } catch (Exception e) {
-            Bukkit.getLogger().warning("Unknown entity type in config: " + name);
+        } catch (final Exception e) {
+            plugin
+                    .getLogger()
+                    .warning("Invalid entity type in config: " + name);
             return null;
         }
+    }
+
+    public RefundMode refundMode() {
+        return refundMode;
     }
 
     public String itemName() { return itemName; }
@@ -147,7 +150,6 @@ public final class PluginConfig {
     public String creativeBypassPermission() { return creativeBypassPermission; }
     public boolean creativeBypassAnnotate() { return creativeBypassAnnotate; }
     public String creativeBypassAnnotation() { return creativeBypassAnnotation; }
-    public boolean stasisEnabled() { return stasisEnabled; }
     public String stasisWorld() { return stasisWorld; }
     public double stasisX() { return stasisX; }
     public double stasisY() { return stasisY; }
@@ -161,8 +163,8 @@ public final class PluginConfig {
     public double releaseOffsetUp() { return releaseOffsetUp; }
     public int releaseProbeSteps() { return releaseProbeSteps; }
 
-    private EffectSpec readEffect(FileConfiguration c, String path) {
-        EffectSpec e = new EffectSpec();
+    private EffectSpec readEffect(final FileConfiguration c, final String path) {
+        final EffectSpec e = new EffectSpec();
         e.particles = c.getBoolean(path + ".particles", true);
         e.particle = c.getString(path + ".particle", "CLOUD");
         e.particleCount = c.getInt(path + ".particle-count", 10);
@@ -172,20 +174,23 @@ public final class PluginConfig {
         return e;
     }
 
-    private FlightSpec readFlight(FileConfiguration c, String path) {
-        FlightSpec f = new FlightSpec();
-        f.enabled = c.getBoolean(path + ".enabled", true);
-        f.glow = c.getBoolean(path + ".glow", true);
-        f.tickPeriod = Math.max(1, c.getInt(path + ".tick-period", 1));
-        f.dust = c.getBoolean(path + ".dust", true);
-        f.dustSize = (float) c.getDouble(path + ".dust-size", 0.9);
-        f.dustCount = c.getInt(path + ".dust-count", 1);
-        f.endRod = c.getBoolean(path + ".end-rod", true);
-        f.endRodPoints = c.getInt(path + ".end-rod-points", 2);
-        f.endRodStep = c.getDouble(path + ".end-rod-step", 0.15);
+    private FlightSpec readFlight(final FileConfiguration c) {
+        final FlightSpec f = new FlightSpec();
+        final String flightConfigPath = "effects.flight";
+        f.enabled = c.getBoolean(flightConfigPath + ".enabled", true);
+        f.glow = c.getBoolean(flightConfigPath + ".glow", true);
+        f.tickPeriod = Math.max(1, c.getInt(flightConfigPath + ".tick-period", 1));
+        f.dust = c.getBoolean(flightConfigPath + ".dust", true);
+        f.dustSize = (float) c.getDouble(flightConfigPath + ".dust-size", 0.9);
+        f.dustCount = c.getInt(flightConfigPath + ".dust-count", 1);
+        f.endRod = c.getBoolean(flightConfigPath + ".end-rod", true);
+        f.endRodPoints = c.getInt(flightConfigPath + ".end-rod-points", 2);
+        f.endRodStep = c.getDouble(flightConfigPath + ".end-rod-step", 0.15);
         return f;
     }
+
+    public enum RefundMode {GIVE, DROP}
     public Set<String> allowedWorlds() { return allowedWorlds; }
     public Set<EntityType> allowedTypes() { return allowedTypes; }
-    
+
 }

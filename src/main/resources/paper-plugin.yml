@@ -12,12 +12,6 @@ libraries:
   - net.kyori:adventure-text-minimessage:4.17.0
 
 permissions:
-  pokeball.use.capture:
-    description: Allow capturing mobs with Pokeball
-    default: true
-  pokeball.use.release:
-    description: Allow releasing mobs from Pokeball
-    default: true
   pokeball.admin.give:
     description: Allow giving Pokeballs
     default: op
@@ -30,3 +24,4 @@ permissions:
   pokeball.admin:
     description: Access to admin subcommands (list/tp/clean/cap)
     default: op
+
