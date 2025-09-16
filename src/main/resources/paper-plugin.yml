@@ -2,3 +2,26 @@ name: Pokeball
 version: '1.0-SNAPSHOT'
 main: com.stdnullptr.pokeball.Pokeball
 api-version: '1.21'
+description: Simple, modern Pokeball plugin for capturing and releasing basic mobs.
+authors: [ stdNullPtr ]
+website: https://example.com/pokeball
+
+folia-supported: false
+
+libraries:
+  - net.kyori:adventure-text-minimessage:4.17.0
+
+permissions:
+  pokeball.admin.give:
+    description: Allow giving Pokeballs
+    default: op
+  pokeball.admin.reload:
+    description: Allow reloading the plugin configuration
+    default: op
+  pokeball.capture.any:
+    description: Allow capturing any entity, even if not on the allowlist
+    default: op
+  pokeball.admin:
+    description: Access to admin subcommands (list/tp/clean/cap)
+    default: op
+
