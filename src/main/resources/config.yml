@@ -35,7 +35,7 @@ capture:
 special-capture:
   permission: pokeball.capture.any
   annotate: true
-  annotation-line: "<gray>How did you get that one?</gray>"
+  annotation-line: "<gold>How did you get that one?</gold>"
 
 # Worlds where capture/release is allowed (empty = all)
 compat:

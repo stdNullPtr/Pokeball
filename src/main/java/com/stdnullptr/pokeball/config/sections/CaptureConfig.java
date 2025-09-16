@@ -30,7 +30,7 @@ public final class CaptureConfig {
         this.specialCaptureAnnotate = config.getBoolean("special-capture.annotate", true);
         this.specialCaptureAnnotation = config.getString(
                 "special-capture.annotation-line",
-                "<gray>How did you get that one?</gray>"
+                "<gold>How did you get that one?</gold>"
         );
 
         // Parse entity types with error handling

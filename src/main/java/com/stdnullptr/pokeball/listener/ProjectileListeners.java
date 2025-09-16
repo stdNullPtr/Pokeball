@@ -343,6 +343,7 @@ public final class ProjectileListeners implements Listener {
         final EntityType type = target.getType();
 
         boolean specialCapture = false;
+        boolean usedSpecialPermission = false;
         final String perm = cfg
                 .capture()
                 .specialCapturePermission();
@@ -360,19 +361,17 @@ public final class ProjectileListeners implements Listener {
             return;
         }
 
-        if (!specialCapture && !cfg
-                .capture()
-                .allowedTypes()
-                .contains(type)) {
-            player.sendMessage(msg(cfg
-                                           .messages()
-                                           .getPrefix() + " " + cfg
-                    .messages()
-                    .getCaptureFailBlocked()));
+        if (!cfg.capture().allowedTypes().contains(type)) {
+            if (!specialCapture) {
+                // No permission and not allowed - fail
+                player.sendMessage(msg(cfg.messages().getPrefix() + " " + cfg.messages().getCaptureFailBlocked()));
                 // Return empty ball on failure
-            giveOrDrop(player, items.createEmptyBall(), dropAt);
+                giveOrDrop(player, items.createEmptyBall(), dropAt);
                 return;
             }
+            // Has permission and mob not in allowed list - mark that we used special permission
+            usedSpecialPermission = true;
+        }
 
 
         // Success: park target in stasis and give filled ball linked to it
@@ -396,12 +395,12 @@ public final class ProjectileListeners implements Listener {
         plugin
                 .stasis()
                 .playCaptureEffects(target.getLocation());
-        final String annotation = (specialCapture && cfg
+        final String annotation = (usedSpecialPermission && cfg
                 .capture()
                 .specialCaptureAnnotate()) ? cfg
                 .capture()
                 .specialCaptureAnnotation() : null;
-        items.markCaptured(filled, type, specialCapture, annotation);
+        items.markCaptured(filled, type, usedSpecialPermission, annotation);
         giveOrDrop(player, filled, dropAt);
         final String captureMessage = cfg.messages().getCaptureSuccess();
         player.sendMessage(msg(cfg.messages().getPrefix() + " " +
