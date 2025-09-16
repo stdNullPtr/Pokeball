@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.stdnullptr.pokeball.Pokeball;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
 import com.stdnullptr.pokeball.item.PokeballItemFactory;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
@@ -20,10 +20,15 @@ import java.util.List;
 public final class GiveCommandExecutor {
 
     private final Pokeball plugin;
-    private final PluginConfig config;
+
+    private final ConfigManager config;
     private final PokeballItemFactory itemFactory;
 
-    public GiveCommandExecutor(final Pokeball plugin, final PluginConfig config, final PokeballItemFactory itemFactory) {
+    public GiveCommandExecutor(
+            final Pokeball plugin,
+            final ConfigManager config,
+            final PokeballItemFactory itemFactory
+    ) {
         this.plugin = plugin;
         this.config = config;
         this.itemFactory = itemFactory;
@@ -84,7 +89,9 @@ public final class GiveCommandExecutor {
         }
 
         // Send confirmation message
-        final String confirmationMessage = config.msgPrefix + " " + config.msgGiven
+        final String givenMessage = config.messages().getGiven();
+        final String confirmationMessage = config.messages().getPrefix() + " " +
+                (givenMessage != null ? givenMessage : "<green>Gave <yellow><count></yellow> Pokeball(s) to <yellow><player></yellow>.")
                 .replace("<count>", String.valueOf(finalAmount))
                 .replace("<player>", target.getName());
 

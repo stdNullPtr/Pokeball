@@ -3,7 +3,7 @@ package com.stdnullptr.pokeball.command.executor;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.stdnullptr.pokeball.Pokeball;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 
@@ -16,9 +16,10 @@ import java.util.List;
 public final class BasicCommandExecutor {
 
     private final Pokeball plugin;
-    private final PluginConfig config;
 
-    public BasicCommandExecutor(final Pokeball plugin, final PluginConfig config) {
+    private final ConfigManager config;
+
+    public BasicCommandExecutor(final Pokeball plugin, final ConfigManager config) {
         this.plugin = plugin;
         this.config = config;
     }
@@ -49,7 +50,9 @@ public final class BasicCommandExecutor {
             lines.add(msg("<yellow>/pokeball admin refund [mode]</yellow> <gray>- Refund behavior</gray>"));
         }
 
-        sender.sendMessage(msg(config.msgPrefix));
+        sender.sendMessage(msg(config
+                                       .messages()
+                                       .getPrefix()));
         for (final Component line : lines) {
             sender.sendMessage(line);
         }
@@ -80,7 +83,11 @@ public final class BasicCommandExecutor {
         config.reload();
         ctx.getSource()
            .getSender()
-           .sendMessage(msg(config.msgPrefix + " " + config.msgReloaded));
+           .sendMessage(msg(config
+                                    .messages()
+                                    .getPrefix() + " " + config
+                   .messages()
+                   .getReloaded()));
 
         return Command.SINGLE_SUCCESS;
     }

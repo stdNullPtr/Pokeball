@@ -1,13 +1,13 @@
 package com.stdnullptr.pokeball.listener;
 
 import com.stdnullptr.pokeball.Pokeball;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
+import com.stdnullptr.pokeball.config.models.RefundMode;
 import com.stdnullptr.pokeball.item.PokeballItemFactory;
 import com.stdnullptr.pokeball.service.StasisService;
 import com.stdnullptr.pokeball.util.Keys;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -32,7 +32,8 @@ import java.util.UUID;
 public final class ProjectileListeners implements Listener {
     private final Pokeball plugin;
     private final PokeballItemFactory items;
-    private final PluginConfig cfg;
+
+    private final ConfigManager cfg;
     private final StasisService stasis;
 
     private final Keys keys;
@@ -40,7 +41,7 @@ public final class ProjectileListeners implements Listener {
     public ProjectileListeners(
             final Pokeball plugin,
             final PokeballItemFactory items,
-            final PluginConfig cfg,
+            final ConfigManager cfg,
             final StasisService stasis,
             final Keys keys
     ) {
@@ -83,8 +84,10 @@ public final class ProjectileListeners implements Listener {
                     .getPersistentDataContainer()
                     .set(keys.getProjectileBall(), PersistentDataType.BYTE, (byte) 1);
         }
-        final var flightCfg = cfg.flight();
-        if (flightCfg != null && flightCfg.glow) {
+        final var flightCfg = cfg
+                .effects()
+                .flight();
+        if (flightCfg != null && flightCfg.glow()) {
             event.getEntity().setGlowing(true);
         }
         // Flight particle trail (configurable)
@@ -94,27 +97,29 @@ public final class ProjectileListeners implements Listener {
                 if (!proj.isValid() || proj.isDead()) { cancel(); return; }
                 final var loc = proj.getLocation();
                 final var world = proj.getWorld();
-                final var flight = cfg.flight();
-                if (flight != null && flight.enabled) {
-                    if (flight.dust) {
+                final var flight = cfg
+                        .effects()
+                        .flight();
+                if (flight != null && flight.enabled()) {
+                    if (flight.dust()) {
                         world.spawnParticle(
                                 Particle.DUST,
                                 loc,
-                                Math.max(0, flight.dustCount),
+                                Math.max(0, flight.dustCount()),
                                 0.0,
                                 0.0,
                                 0.0,
-                                new Particle.DustOptions(Color.fromRGB(220, 40, 40), Math.max(0.1f, flight.dustSize))
+                                new Particle.DustOptions(Color.fromRGB(220, 40, 40), Math.max(0.1f, flight.dustSize()))
                         );
                     }
-                    if (flight.endRod) {
+                    if (flight.endRod()) {
                         final Vector v = proj.getVelocity();
                         if (v.lengthSquared() > 1.0E-4) {
                             final Vector dir = v
                                     .clone()
                                     .normalize();
-                            final double step = flight.endRodStep <= 0 ? 0.15 : flight.endRodStep;
-                            final int streak = Math.max(0, flight.endRodPoints);
+                            final double step = flight.endRodStep() <= 0 ? 0.15 : flight.endRodStep();
+                            final int streak = Math.max(0, flight.endRodPoints());
                             for (int i = 1; i <= streak; i++) {
                                 final Location p = loc
                                         .clone()
@@ -127,7 +132,7 @@ public final class ProjectileListeners implements Listener {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0L, Math.max(1L, (flightCfg != null ? flightCfg.tickPeriod : 1)));
+        }.runTaskTimer(plugin, 0L, Math.max(1L, (flightCfg != null ? flightCfg.tickPeriod() : 1)));
 
         // Consume the Pokeball from hand for all gamemodes (avoid creative dupes)
         final int amt = hand.getAmount();
@@ -169,15 +174,24 @@ public final class ProjectileListeners implements Listener {
                     .stasis()
                     .release(ballId, spawnAt);
             if (!ok) {
-                player.sendMessage(msg(cfg.msgPrefix + " <red>Release failed (stored mob not found).</red>"));
+                player.sendMessage(msg(cfg
+                                               .messages()
+                                               .getPrefix() + " <red>Release failed (stored mob not found).</red>"));
             } else {
                 // Optionally inform type
                 final var type = plugin
                         .stasis()
                         .peekType(ballId);
-                if (type != null) player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgReleaseSuccess.replace("<type>", type.name())));
+                if (type != null) {
+                    final String releaseMessage = cfg.messages().getReleaseSuccess();
+                    player.sendMessage(msg(cfg.messages().getPrefix() + " " +
+                                                   (releaseMessage != null ? releaseMessage : "<green>Released a <yellow><type></yellow>.")
+                                                           .replace("<type>", type.name())));
+                }
                 // Refund empty ball if not configured to consume on release
-                if (!cfg.consumeOnRelease()) {
+                if (!cfg
+                        .capture()
+                        .consumeOnRelease()) {
                     giveOrDrop(player, items.createEmptyBall(), spawnAt);
                 }
             }
@@ -220,9 +234,18 @@ public final class ProjectileListeners implements Listener {
             // Start with the block just outside the face that was hit
             Block candidate = hitBlock.getRelative(face);
             final Vector n = new Vector(face.getModX(), face.getModY(), face.getModZ());
-            final int max = Math.max(1, cfg.releaseProbeSteps());
-            final double offN = cfg.releaseOffsetNormal();
-            final double offUp = cfg.releaseOffsetUp();
+            final int max = Math.max(
+                    1,
+                    cfg
+                            .effects()
+                            .releaseProbeSteps()
+            );
+            final double offN = cfg
+                    .effects()
+                    .releaseOffsetNormal();
+            final double offUp = cfg
+                    .effects()
+                    .releaseOffsetUp();
             for (int i = 0; i < max; i++) {
                 if (isSafeSpawn(candidate, type)) {
                     return centerOf(candidate).add(n.clone().multiply(offN)).add(0, offUp, 0);
@@ -309,28 +332,43 @@ public final class ProjectileListeners implements Listener {
 
     private void handleCapture(final Player player, final Entity target, final Location dropAt) {
         if (!worldAllowed(player.getWorld().getName())) {
-            player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgCaptureFailWorld));
+            player.sendMessage(msg(cfg
+                                           .messages()
+                                           .getPrefix() + " " + cfg
+                    .messages()
+                    .getCaptureFailWorld()));
             giveOrDrop(player, items.createEmptyBall(), dropAt);
             return;
         }
         final EntityType type = target.getType();
 
         boolean specialCapture = false;
-        final String perm = cfg.specialCapturePermission();
+        final String perm = cfg
+                .capture()
+                .specialCapturePermission();
         if (perm != null && !perm.isBlank()) {
             specialCapture = player.hasPermission(perm);
         }
 
         if (target instanceof Player) {
-            player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgCaptureFailPlayer));
+            player.sendMessage(msg(cfg
+                                           .messages()
+                                           .getPrefix() + " " + cfg
+                    .messages()
+                    .getCaptureFailPlayer()));
             giveOrDrop(player, items.createEmptyBall(), dropAt);
             return;
         }
 
         if (!specialCapture && !cfg
+                .capture()
                 .allowedTypes()
                 .contains(type)) {
-                player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgCaptureFailBlocked));
+            player.sendMessage(msg(cfg
+                                           .messages()
+                                           .getPrefix() + " " + cfg
+                    .messages()
+                    .getCaptureFailBlocked()));
                 // Return empty ball on failure
             giveOrDrop(player, items.createEmptyBall(), dropAt);
                 return;
@@ -347,7 +385,9 @@ public final class ProjectileListeners implements Listener {
         try {
             stasis.park(target, ballId);
         } catch (final IllegalStateException cap) {
-            player.sendMessage(msg(cfg.msgPrefix + " <red>Capture refused: storage is full.</red>"));
+            player.sendMessage(msg(cfg
+                                           .messages()
+                                           .getPrefix() + " <red>Capture refused: storage is full.</red>"));
             // Refund empty ball
             giveOrDrop(player, items.createEmptyBall(), dropAt);
             return;
@@ -356,15 +396,24 @@ public final class ProjectileListeners implements Listener {
         plugin
                 .stasis()
                 .playCaptureEffects(target.getLocation());
-        final String annotation = (specialCapture && cfg.specialCaptureAnnotate()) ? cfg.specialCaptureAnnotation() : null;
+        final String annotation = (specialCapture && cfg
+                .capture()
+                .specialCaptureAnnotate()) ? cfg
+                .capture()
+                .specialCaptureAnnotation() : null;
         items.markCaptured(filled, type, specialCapture, annotation);
         giveOrDrop(player, filled, dropAt);
-        player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgCaptureSuccess.replace("<type>", type.name())));
+        final String captureMessage = cfg.messages().getCaptureSuccess();
+        player.sendMessage(msg(cfg.messages().getPrefix() + " " +
+                                       (captureMessage != null ? captureMessage : "<green>Captured a <yellow><type></yellow>!")
+                                               .replace("<type>", type.name())));
     }
 
     private void giveOrDrop(final Player player, final ItemStack stack, final Location dropAt) {
         final var world = dropAt.getWorld();
-        if (cfg.refundMode() == PluginConfig.RefundMode.DROP) {
+        if (cfg
+                .effects()
+                .refundMode() == RefundMode.DROP) {
             if (world != null) {
                 try {
                     world.dropItemNaturally(dropAt, stack);
@@ -394,7 +443,13 @@ public final class ProjectileListeners implements Listener {
     }
 
     private boolean worldAllowed(final String world) {
-        return cfg.allowedWorlds().isEmpty() || cfg.allowedWorlds().contains(world);
+        return cfg
+                .stasis()
+                .allowedWorlds()
+                .isEmpty() || cfg
+                .stasis()
+                .allowedWorlds()
+                .contains(world);
     }
 
     private Component msg(final String mm) {

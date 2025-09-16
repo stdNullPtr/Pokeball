@@ -6,7 +6,7 @@ import com.stdnullptr.pokeball.command.executor.AdminCommandExecutor;
 import com.stdnullptr.pokeball.command.executor.BasicCommandExecutor;
 import com.stdnullptr.pokeball.command.executor.GiveCommandExecutor;
 import com.stdnullptr.pokeball.command.suggestion.PokeballSuggestionProviders;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
 import com.stdnullptr.pokeball.item.PokeballItemFactory;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 
@@ -17,10 +17,11 @@ import java.util.List;
  */
 public final class PokeballCommands {
     private final Pokeball plugin;
-    private final PluginConfig config;
+
+    private final ConfigManager config;
     private final PokeballItemFactory itemFactory;
 
-    public PokeballCommands(final Pokeball plugin, final PokeballItemFactory itemFactory, final PluginConfig config) {
+    public PokeballCommands(final Pokeball plugin, final PokeballItemFactory itemFactory, final ConfigManager config) {
         this.plugin = plugin;
         this.config = config;
         this.itemFactory = itemFactory;

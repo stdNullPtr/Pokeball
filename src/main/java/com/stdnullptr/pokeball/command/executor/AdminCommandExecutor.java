@@ -5,9 +5,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.stdnullptr.pokeball.Pokeball;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
+import com.stdnullptr.pokeball.config.models.RefundMode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -19,9 +21,10 @@ import java.util.UUID;
 public final class AdminCommandExecutor {
 
     private final Pokeball plugin;
-    private final PluginConfig config;
 
-    public AdminCommandExecutor(final Pokeball plugin, final PluginConfig config) {
+    private final ConfigManager config;
+
+    public AdminCommandExecutor(final Pokeball plugin, final ConfigManager config) {
         this.plugin = plugin;
         this.config = config;
     }
@@ -137,7 +140,7 @@ public final class AdminCommandExecutor {
         }
     }
 
-    private int cleanAll(final org.bukkit.command.CommandSender sender) {
+    private int cleanAll(final CommandSender sender) {
         final var ids = new HashSet<>(plugin.stasis().ids());
 
         for (final String id : ids) {
@@ -148,7 +151,7 @@ public final class AdminCommandExecutor {
         return Command.SINGLE_SUCCESS;
     }
 
-    private int cleanSingle(final org.bukkit.command.CommandSender sender, final String target) {
+    private int cleanSingle(final CommandSender sender, final String target) {
         try {
             final UUID id = UUID.fromString(target);
             plugin.stasis().remove(id);
@@ -179,15 +182,17 @@ public final class AdminCommandExecutor {
         }
     }
 
-    private int showCapacity(final org.bukkit.command.CommandSender sender) {
-        final int maxTotal = config.stasisCapTotal();
+    private int showCapacity(final CommandSender sender) {
+        final int maxTotal = config
+                .stasis()
+                .capTotal();
         final String status = (maxTotal > 0) ? "" + maxTotal : "unlimited";
 
         sender.sendMessage(msg("<gray>Storage cap: <yellow>" + status + "</yellow></gray>"));
         return Command.SINGLE_SUCCESS;
     }
 
-    private int setCapacity(final org.bukkit.command.CommandSender sender, final int maxTotal) {
+    private int setCapacity(final CommandSender sender, final int maxTotal) {
         final var conf = plugin.getConfig();
         conf.set("stasis.cap.max-total", maxTotal);
         plugin.saveConfig();
@@ -219,17 +224,20 @@ public final class AdminCommandExecutor {
         }
     }
 
-    private int showRefundMode(final org.bukkit.command.CommandSender sender) {
-        final String mode = config.refundMode().name();
+    private int showRefundMode(final CommandSender sender) {
+        final String mode = config
+                .effects()
+                .refundMode()
+                .name();
         sender.sendMessage(msg("<gray>Refund mode: <yellow>" + mode + "</yellow></gray>"));
         return Command.SINGLE_SUCCESS;
     }
 
-    private int setRefundMode(final org.bukkit.command.CommandSender sender, final String modeArg) {
-        final PluginConfig.RefundMode mode;
+    private int setRefundMode(final CommandSender sender, final String modeArg) {
+        final RefundMode mode;
 
         try {
-            mode = PluginConfig.RefundMode.valueOf(modeArg.toUpperCase());
+            mode = RefundMode.valueOf(modeArg.toUpperCase());
         } catch (final Exception e) {
             sender.sendMessage(msg("<red>Invalid mode. Use GIVE or DROP.</red>"));
             return 0;

@@ -1,7 +1,7 @@
 package com.stdnullptr.pokeball.item;
 
 import com.stdnullptr.pokeball.Pokeball;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
 import com.stdnullptr.pokeball.util.Keys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.UUID;
 
 public final class PokeballItemFactory {
-    private final PluginConfig cfg;
+    private final ConfigManager cfg;
     private final MiniMessage mini;
 
     private final Keys keys;
 
-    public PokeballItemFactory(final Pokeball plugin, final PluginConfig cfg, final Keys keys) {
+    public PokeballItemFactory(final Pokeball plugin, final ConfigManager cfg, final Keys keys) {
         this.cfg = cfg;
         this.mini = plugin.mini();
         this.keys = keys;
@@ -34,7 +34,15 @@ public final class PokeballItemFactory {
     public ItemStack createEmptyBall() {
         final ItemStack item = new ItemStack(Material.SNOWBALL, 1); // placeholder item
         final ItemMeta meta = item.getItemMeta();
-        applyCommonMeta(meta, cfg.itemName(), cfg.itemLore());
+        applyCommonMeta(
+                meta,
+                cfg
+                        .items()
+                        .name(),
+                cfg
+                        .items()
+                        .lore()
+        );
         final PersistentDataContainer pdc = meta.getPersistentDataContainer();
         // Unique ID ensures non-stacking
         pdc.set(
@@ -84,7 +92,17 @@ public final class PokeballItemFactory {
         final PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(keys.getCapturedType(), PersistentDataType.STRING, type.name());
         // Update lore to show captured type
-        applyCommonMeta(meta, cfg.itemName(), cfg.itemLore(), type, (bypass && bypassAnnotation != null) ? bypassAnnotation : null);
+        applyCommonMeta(
+                meta,
+                cfg
+                        .items()
+                        .name(),
+                cfg
+                        .items()
+                        .lore(),
+                type,
+                (bypass && bypassAnnotation != null) ? bypassAnnotation : null
+        );
         stack.setItemMeta(meta);
     }
 
@@ -109,16 +127,21 @@ public final class PokeballItemFactory {
             loreLines.add(mini.deserialize(extraAnnotation));
         }
         meta.lore(loreLines);
-        if (cfg.customModelData() != null) {
+        if (cfg
+                .items()
+                .customModelData() != null) {
             try {
                 final CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
                 cmd.setFloats(List.of(cfg
+                                              .items()
                         .customModelData()
                         .floatValue()));
                 meta.setCustomModelDataComponent(cmd);
             } catch (final NoSuchMethodError | NoClassDefFoundError ignored) {
                 // Fallback for older API
-                meta.setCustomModelData(cfg.customModelData());
+                meta.setCustomModelData(cfg
+                                                .items()
+                                                .customModelData());
             }
         }
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);

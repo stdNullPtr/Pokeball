@@ -1,6 +1,7 @@
 package com.stdnullptr.pokeball.service;
 
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
+import com.stdnullptr.pokeball.config.models.EffectSpec;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -29,11 +30,11 @@ import java.util.UUID;
 public final class StasisService {
     private final Plugin plugin;
 
-    private final PluginConfig cfg;
+    private final ConfigManager cfg;
     private final File file;
     private final FileConfiguration data;
 
-    public StasisService(final Plugin plugin, final PluginConfig cfg) {
+    public StasisService(final Plugin plugin, final ConfigManager cfg) {
         this.plugin = plugin;
         this.cfg = cfg;
         if (!plugin
@@ -114,7 +115,7 @@ public final class StasisService {
 
     public void park(final Entity entity, final UUID ballId) {
         // Enforce cap if configured (0 = unlimited)
-        final int maxTotal = cfg.stasisCapTotal();
+        final int maxTotal = cfg.stasis().capTotal();
         if (maxTotal > 0) {
             final int total = data
                     .getKeys(false)
@@ -252,9 +253,9 @@ public final class StasisService {
     }
 
     private Location computeStashLocation(final World fallbackWorld) {
-        World w = Bukkit.getWorld(cfg.stasisWorld());
+        World w = Bukkit.getWorld(cfg.stasis().world());
         if (w == null) w = fallbackWorld;
-        return new Location(w, cfg.stasisX(), cfg.stasisY(), cfg.stasisZ());
+        return new Location(w, cfg.stasis().x(), cfg.stasis().y(), cfg.stasis().z());
     }
 
     public EntityType peekType(final UUID ballId) {
@@ -317,22 +318,22 @@ public final class StasisService {
     }
 
     public void playCaptureEffects(final Location at) {
-        playEffects(at, cfg.captureEffect());
+        playEffects(at, cfg.effects().captureEffect());
     }
 
     public void playReleaseEffects(final Location at) {
-        playEffects(at, cfg.releaseEffect());
+        playEffects(at, cfg.effects().releaseEffect());
     }
 
-    private void playEffects(final Location at, final PluginConfig.EffectSpec spec) {
+    private void playEffects(final Location at, final EffectSpec spec) {
         if (spec == null) return;
-        if (spec.particles) {
-            if ("FANCY".equalsIgnoreCase(spec.particle)) {
+        if (spec.particles()) {
+            if ("FANCY".equalsIgnoreCase(spec.particle())) {
                 try {
                     // Ring of red dust around the point
                     final var world = at.getWorld();
                     final var dust = new Particle.DustOptions(Color.fromRGB(220, 40, 40), 1.3f);
-                    final int points = Math.max(12, spec.particleCount);
+                    final int points = Math.max(12, spec.particleCount());
                     final double radius = 0.7;
                     for (int i = 0; i < points; i++) {
                         final double angle = (2 * Math.PI * i) / points;
@@ -341,7 +342,7 @@ public final class StasisService {
                         world.spawnParticle(Particle.DUST, new Location(world, x, at.getY() + 0.2, z), 1, dust);
                     }
                     // Sparkle burst
-                    world.spawnParticle(Particle.CRIT, at, Math.max(10, spec.particleCount / 2), 0.2, 0.2, 0.2, 0.02);
+                    world.spawnParticle(Particle.CRIT, at, Math.max(10, spec.particleCount() / 2), 0.2, 0.2, 0.2, 0.02);
                     // Subtle swirl
                     world.spawnParticle(
                             Particle.END_ROD,
@@ -358,21 +359,19 @@ public final class StasisService {
                 }
             } else {
                 try {
-                    final var p = Particle.valueOf(spec.particle.toUpperCase());
-                    at.getWorld().spawnParticle(p, at, Math.max(1, spec.particleCount));
+                    final var p = Particle.valueOf(spec.particle().toUpperCase());
+                    at.getWorld().spawnParticle(p, at, Math.max(1, spec.particleCount()));
                 } catch (final Exception ignored) {
                 }
             }
         }
-        if (spec.sound != null && !spec.sound.isEmpty()) {
+        if (spec.sound() != null && !spec.sound().isEmpty()) {
             try {
-                final var key = NamespacedKey.fromString(spec.sound.toLowerCase());
+                final var key = NamespacedKey.fromString(spec.sound().toLowerCase());
                 if (key != null) {
                     final var s = Registry.SOUNDS.get(key);
                     if (s != null) {
-                        at
-                                .getWorld()
-                                .playSound(at, s, spec.volume, spec.pitch);
+                        at.getWorld().playSound(at, s, spec.volume(), spec.pitch());
                     }
                 }
             } catch (final Exception ignored) {

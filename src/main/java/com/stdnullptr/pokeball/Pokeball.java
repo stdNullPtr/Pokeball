@@ -1,7 +1,7 @@
 package com.stdnullptr.pokeball;
 
 import com.stdnullptr.pokeball.command.PokeballCommands;
-import com.stdnullptr.pokeball.config.PluginConfig;
+import com.stdnullptr.pokeball.config.ConfigManager;
 import com.stdnullptr.pokeball.item.PokeballItemFactory;
 import com.stdnullptr.pokeball.listener.ProjectileListeners;
 import com.stdnullptr.pokeball.listener.StasisCleanupListener;
@@ -19,7 +19,7 @@ public final class Pokeball extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        final PluginConfig configModel;
+        final ConfigManager configModel;
         final Keys keys;
         final PokeballItemFactory itemFactory;
         this.logger = getSLF4JLogger();
@@ -27,7 +27,7 @@ public final class Pokeball extends JavaPlugin {
 
         // Save default config if not present
         saveDefaultConfig();
-        configModel = new PluginConfig(this);
+        configModel = new ConfigManager(this);
 
         // Prepare Keys instance (DI-friendly)
         keys = new Keys(this);
