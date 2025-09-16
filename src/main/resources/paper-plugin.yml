@@ -18,8 +18,8 @@ permissions:
   pokeball.admin.reload:
     description: Allow reloading the plugin configuration
     default: op
-  pokeball.bypass.creative:
-    description: Allow creative-mode bypass of capture restrictions
+  pokeball.capture.any:
+    description: Allow capturing any entity, even if not on the allowlist
     default: op
   pokeball.admin:
     description: Access to admin subcommands (list/tp/clean/cap)

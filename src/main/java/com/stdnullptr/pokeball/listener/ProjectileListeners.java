@@ -315,10 +315,10 @@ public final class ProjectileListeners implements Listener {
         }
         final EntityType type = target.getType();
 
-        boolean creativeBypass = false;
-        if (cfg.creativeBypassEnabled() && player.getGameMode() == GameMode.CREATIVE) {
-            final String perm = cfg.creativeBypassPermission();
-            creativeBypass = perm == null || perm.isBlank() || player.hasPermission(perm);
+        boolean specialCapture = false;
+        final String perm = cfg.specialCapturePermission();
+        if (perm != null && !perm.isBlank()) {
+            specialCapture = player.hasPermission(perm);
         }
 
         if (target instanceof Player) {
@@ -327,7 +327,7 @@ public final class ProjectileListeners implements Listener {
             return;
         }
 
-        if (!creativeBypass && !cfg
+        if (!specialCapture && !cfg
                 .allowedTypes()
                 .contains(type)) {
                 player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgCaptureFailBlocked));
@@ -356,8 +356,8 @@ public final class ProjectileListeners implements Listener {
         plugin
                 .stasis()
                 .playCaptureEffects(target.getLocation());
-        final String annotation = (creativeBypass && cfg.creativeBypassAnnotate()) ? cfg.creativeBypassAnnotation() : null;
-        items.markCaptured(filled, type, creativeBypass, annotation);
+        final String annotation = (specialCapture && cfg.specialCaptureAnnotate()) ? cfg.specialCaptureAnnotation() : null;
+        items.markCaptured(filled, type, specialCapture, annotation);
         giveOrDrop(player, filled, dropAt);
         player.sendMessage(msg(cfg.msgPrefix + " " + cfg.msgCaptureSuccess.replace("<type>", type.name())));
     }

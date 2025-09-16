@@ -9,7 +9,7 @@ item:
 
 # Capture rules
 # 'allowed-entity-types' is a strict allowlist. Use Bukkit EntityType names (e.g., COW, SHEEP, ZOMBIE).
-# Anything not listed is blocked (unless admin creative bypass applies).
+# Anything not listed is blocked (unless player has special capture permission).
 capture:
   allowed-entity-types:
     - COW
@@ -29,15 +29,13 @@ capture:
   # If true, releasing consumes the Pokeball; if false, the ball is returned (see refund.mode below).
   consume-on-release: false
 
-# Creative bypass
-# When enabled, ops (or those with the bypass permission) in creative can capture any entity even if not on the allowlist.
-# 'permission' is the node to check (set to blank to allow all creative players).
-# If 'annotate' is true, add a lore line to mark bypass captures.
-creative-bypass:
-  enabled: true
-  permission: pokeball.bypass.creative
+# Special capture permission
+# Players with this permission can capture any entity, even if not on the allowlist.
+# By default, only ops have this permission.
+special-capture:
+  permission: pokeball.capture.any
   annotate: true
-  annotation-line: "<gray>Captured via <red>Admin Bypass</red></gray>"
+  annotation-line: "<gray>How did you get that one?</gray>"
 
 # Worlds where capture/release is allowed (empty = all)
 compat:

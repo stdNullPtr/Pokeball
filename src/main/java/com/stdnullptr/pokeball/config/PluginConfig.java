@@ -16,10 +16,9 @@ public final class PluginConfig {
     private List<String> itemLore;
     private Integer customModelData;
     private boolean consumeOnRelease;
-    private boolean creativeBypassEnabled;
-    private String creativeBypassPermission;
-    private boolean creativeBypassAnnotate;
-    private String creativeBypassAnnotation;
+    private String specialCapturePermission;
+    private boolean specialCaptureAnnotate;
+    private String specialCaptureAnnotation;
     private String stasisWorld;
     private double stasisX;
     private double stasisY;
@@ -83,10 +82,9 @@ public final class PluginConfig {
 
         this.consumeOnRelease = c.getBoolean("capture.consume-on-release", false);
 
-        this.creativeBypassEnabled = c.getBoolean("creative-bypass.enabled", true);
-        this.creativeBypassPermission = c.getString("creative-bypass.permission", "pokeball.bypass.creative");
-        this.creativeBypassAnnotate = c.getBoolean("creative-bypass.annotate", true);
-        this.creativeBypassAnnotation = c.getString("creative-bypass.annotation-line", "<gray>Captured via <red>Creative Bypass</red></gray>");
+        this.specialCapturePermission = c.getString("special-capture.permission", "pokeball.capture.any");
+        this.specialCaptureAnnotate = c.getBoolean("special-capture.annotate", true);
+        this.specialCaptureAnnotation = c.getString("special-capture.annotation-line", "<gray>How did you get that one?</gray>");
 
         this.allowedWorlds = new HashSet<>(c.getStringList("compat.worlds"));
 
@@ -146,10 +144,9 @@ public final class PluginConfig {
     public List<String> itemLore() { return itemLore; }
     public Integer customModelData() { return customModelData; }
     public boolean consumeOnRelease() { return consumeOnRelease; }
-    public boolean creativeBypassEnabled() { return creativeBypassEnabled; }
-    public String creativeBypassPermission() { return creativeBypassPermission; }
-    public boolean creativeBypassAnnotate() { return creativeBypassAnnotate; }
-    public String creativeBypassAnnotation() { return creativeBypassAnnotation; }
+    public String specialCapturePermission() { return specialCapturePermission; }
+    public boolean specialCaptureAnnotate() { return specialCaptureAnnotate; }
+    public String specialCaptureAnnotation() { return specialCaptureAnnotation; }
     public String stasisWorld() { return stasisWorld; }
     public double stasisX() { return stasisX; }
     public double stasisY() { return stasisY; }
