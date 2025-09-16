@@ -70,9 +70,7 @@ stasis:
   y: 320.0
   z: 0.0
   cap:
-    # Enable a soft cap for total stasis entries; further captures are refused.
-    enabled: false
-    # Maximum number of stored entries when cap is enabled (positive integer).
+    # Maximum number of stored entries (0 = unlimited).
     max-total: 500
 
 effects:

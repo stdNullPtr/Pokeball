@@ -1,6 +1,5 @@
 package com.stdnullptr.pokeball.command.builder;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -108,23 +107,19 @@ public final class CommandTreeBuilder {
 
     private LiteralArgumentBuilder<CommandSourceStack> buildCapacityCommands() {
         return Commands.literal("cap")
-                .executes(adminExecutor::showCapUsage)
-                .then(Commands.literal("get")
-                        .executes(adminExecutor::getCapacity))
-                .then(Commands.literal("set")
-                        .then(Commands.argument("enabled", BoolArgumentType.bool())
-                                .then(Commands.argument("maxTotal", IntegerArgumentType.integer(1, 100000))
-                                        .suggests(suggestions.capacityLimits())
-                                        .executes(adminExecutor::setCapacity))));
+                       .executes(adminExecutor::handleCapacity)
+                       .then(Commands
+                               .argument("maxTotal", IntegerArgumentType.integer(0, 100000))
+                               .suggests(suggestions.capacityLimits())
+                               .executes(adminExecutor::handleCapacity));
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> buildRefundCommands() {
         return Commands.literal("refund")
-                .then(Commands.literal("get")
-                        .executes(adminExecutor::getRefundMode))
-                .then(Commands.literal("set")
-                        .then(Commands.argument("mode", StringArgumentType.word())
-                                .suggests(suggestions.refundModes())
-                                .executes(adminExecutor::setRefundMode)));
+                       .executes(adminExecutor::handleRefund)
+                       .then(Commands
+                               .argument("mode", StringArgumentType.word())
+                               .suggests(suggestions.refundModes())
+                               .executes(adminExecutor::handleRefund));
     }
 }

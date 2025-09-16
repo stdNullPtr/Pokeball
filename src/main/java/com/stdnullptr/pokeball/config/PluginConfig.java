@@ -23,7 +23,6 @@ public final class PluginConfig {
     private double stasisX;
     private double stasisY;
     private double stasisZ;
-    private boolean stasisCapEnabled;
     private int stasisCapTotal;
 
     // Effects
@@ -104,7 +103,6 @@ public final class PluginConfig {
         this.stasisX = c.getDouble("stasis.x", 0.0);
         this.stasisY = c.getDouble("stasis.y", 320.0);
         this.stasisZ = c.getDouble("stasis.z", 0.0);
-        this.stasisCapEnabled = c.getBoolean("stasis.cap.enabled", false);
         this.stasisCapTotal = c.getInt("stasis.cap.max-total", 500);
 
         this.captureEffect = readEffect(c, "effects.capture");
@@ -151,7 +149,6 @@ public final class PluginConfig {
     public double stasisX() { return stasisX; }
     public double stasisY() { return stasisY; }
     public double stasisZ() { return stasisZ; }
-    public boolean stasisCapEnabled() { return stasisCapEnabled; }
     public int stasisCapTotal() { return stasisCapTotal; }
     public EffectSpec captureEffect() { return captureEffect; }
     public EffectSpec releaseEffect() { return releaseEffect; }

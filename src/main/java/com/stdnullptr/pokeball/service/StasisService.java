@@ -113,12 +113,13 @@ public final class StasisService {
     }
 
     public void park(final Entity entity, final UUID ballId) {
-        // Enforce cap if configured
-        if (cfg.stasisCapEnabled()) {
+        // Enforce cap if configured (0 = unlimited)
+        final int maxTotal = cfg.stasisCapTotal();
+        if (maxTotal > 0) {
             final int total = data
                     .getKeys(false)
                     .size();
-            if (total >= cfg.stasisCapTotal()) {
+            if (total >= maxTotal) {
                 // refuse capture by throwing IllegalStateException; caller will handle refund
                 throw new IllegalStateException("Stasis cap reached");
             }

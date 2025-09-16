@@ -45,8 +45,8 @@ public final class BasicCommandExecutor {
             lines.add(msg("<yellow>/pokeball admin list</yellow> <gray>- List stasis entries</gray>"));
             lines.add(msg("<yellow>/pokeball admin tp <id></yellow> <gray>- Teleport to stasis</gray>"));
             lines.add(msg("<yellow>/pokeball admin clean <id|all></yellow> <gray>- Remove entries</gray>"));
-            lines.add(msg("<yellow>/pokeball admin cap get|set <enabled> <max></yellow> <gray>- Storage cap</gray>"));
-            lines.add(msg("<yellow>/pokeball admin refund get|set <GIVE|DROP></yellow> <gray>- Refund behavior</gray>"));
+            lines.add(msg("<yellow>/pokeball admin cap [max]</yellow> <gray>- Storage cap</gray>"));
+            lines.add(msg("<yellow>/pokeball admin refund [mode]</yellow> <gray>- Refund behavior</gray>"));
         }
 
         sender.sendMessage(msg(config.msgPrefix));

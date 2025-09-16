@@ -1,7 +1,6 @@
 package com.stdnullptr.pokeball.command.executor;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -165,45 +164,37 @@ public final class AdminCommandExecutor {
     // CAPACITY COMMANDS
 
     /**
-     * Shows capacity command usage
+     * Handles capacity command - shows current cap or sets new cap
      */
-    public int showCapUsage(final CommandContext<CommandSourceStack> ctx) {
-        ctx.getSource()
-           .getSender()
-           .sendMessage(msg("<yellow>Usage:</yellow> /pokeball admin cap <get|set <enabled> <max>>"));
-
-        return Command.SINGLE_SUCCESS;
-    }
-
-    /**
-     * Gets current capacity settings
-     */
-    public int getCapacity(final CommandContext<CommandSourceStack> ctx) {
+    public int handleCapacity(final CommandContext<CommandSourceStack> ctx) {
         final var sender = ctx.getSource().getSender();
-        final boolean enabled = config.stasisCapEnabled();
+
+        try {
+            // Check if maxTotal argument is provided
+            final int maxTotal = IntegerArgumentType.getInteger(ctx, "maxTotal");
+            return setCapacity(sender, maxTotal);
+        } catch (final IllegalArgumentException e) {
+            // No argument provided - show current capacity
+            return showCapacity(sender);
+        }
+    }
+
+    private int showCapacity(final org.bukkit.command.CommandSender sender) {
         final int maxTotal = config.stasisCapTotal();
+        final String status = (maxTotal > 0) ? "" + maxTotal : "unlimited";
 
-        sender.sendMessage(msg("<gray>Cap enabled: " + enabled + ", max-total: " + maxTotal));
-
+        sender.sendMessage(msg("<gray>Storage cap: <yellow>" + status + "</yellow></gray>"));
         return Command.SINGLE_SUCCESS;
     }
 
-    /**
-     * Sets capacity settings
-     */
-    public int setCapacity(final CommandContext<CommandSourceStack> ctx) {
-        final boolean enabled = BoolArgumentType.getBool(ctx, "enabled");
-        final int maxTotal = IntegerArgumentType.getInteger(ctx, "maxTotal");
-
+    private int setCapacity(final org.bukkit.command.CommandSender sender, final int maxTotal) {
         final var conf = plugin.getConfig();
-        conf.set("stasis.cap.enabled", enabled);
         conf.set("stasis.cap.max-total", maxTotal);
         plugin.saveConfig();
         config.reload();
 
-        ctx.getSource()
-           .getSender()
-           .sendMessage(msg("<green>Updated cap: enabled=" + enabled + ", max=" + maxTotal + "</green>"));
+        final String status = (maxTotal > 0) ? "" + maxTotal : "unlimited";
+        sender.sendMessage(msg("<green>Storage cap set to: <yellow>" + status + "</yellow></green>"));
 
         return Command.SINGLE_SUCCESS;
     }
@@ -211,31 +202,36 @@ public final class AdminCommandExecutor {
     // REFUND COMMANDS
 
     /**
-     * Gets current refund mode
+     * Handles refund command - shows current mode or sets new mode
      */
-    public int getRefundMode(final CommandContext<CommandSourceStack> ctx) {
+    public int handleRefund(final CommandContext<CommandSourceStack> ctx) {
+        final var sender = ctx
+                .getSource()
+                .getSender();
+
+        try {
+            // Check if mode argument is provided
+            final String modeArg = StringArgumentType.getString(ctx, "mode");
+            return setRefundMode(sender, modeArg);
+        } catch (final IllegalArgumentException e) {
+            // No argument provided - show current mode
+            return showRefundMode(sender);
+        }
+    }
+
+    private int showRefundMode(final org.bukkit.command.CommandSender sender) {
         final String mode = config.refundMode().name();
-
-        ctx.getSource()
-           .getSender()
-           .sendMessage(msg("<gray>Refund mode: <yellow>" + mode + "</yellow></gray>"));
-
+        sender.sendMessage(msg("<gray>Refund mode: <yellow>" + mode + "</yellow></gray>"));
         return Command.SINGLE_SUCCESS;
     }
 
-    /**
-     * Sets refund mode
-     */
-    public int setRefundMode(final CommandContext<CommandSourceStack> ctx) {
-        final String modeArg = StringArgumentType.getString(ctx, "mode");
+    private int setRefundMode(final org.bukkit.command.CommandSender sender, final String modeArg) {
         final PluginConfig.RefundMode mode;
 
         try {
             mode = PluginConfig.RefundMode.valueOf(modeArg.toUpperCase());
         } catch (final Exception e) {
-            ctx.getSource()
-               .getSender()
-               .sendMessage(msg("<red>Invalid mode. Use GIVE or DROP.</red>"));
+            sender.sendMessage(msg("<red>Invalid mode. Use GIVE or DROP.</red>"));
             return 0;
         }
 
@@ -244,10 +240,7 @@ public final class AdminCommandExecutor {
         plugin.saveConfig();
         config.reload();
 
-        ctx.getSource()
-           .getSender()
-           .sendMessage(msg("<green>Refund mode set to <yellow>" + mode.name() + "</yellow></green>"));
-
+        sender.sendMessage(msg("<green>Refund mode set to <yellow>" + mode.name() + "</yellow></green>"));
         return Command.SINGLE_SUCCESS;
     }
 
