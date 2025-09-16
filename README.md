@@ -59,4 +59,4 @@ Notes:
 - Config key: `refund.mode: GIVE|DROP`
   - `GIVE`: tries to return balls to the player inventory; if full, drops at the impact location.
   - `DROP`: always drops balls at the impact location.
-- Live control (ops): `/pokeball admin refund get|set <GIVE|DROP>`
+- Live control (ops): `/pokeball admin refund [mode]` — view current mode or set new mode (GIVE|DROP)
