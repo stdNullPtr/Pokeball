@@ -13,13 +13,6 @@ Pokeball lets you “catch” a mob in a ball and “throw” it back out, just 
 - Admins give balls to players; players just use them
   - Normal players don’t need special permissions — they only need balls
 
-## Why It’s Reliable
-
-- No fragile tricks, no weird side effects
-- The plugin doesn’t try to “rebuild” mobs
-- Instead, it freezes the real mob and safely moves it away during capture (so it can’t be bumped or attacked)
-- When you throw the ball to release, the original mob is brought back with its gear and personality intact
-
 ## How You Use It (Players)
 
 - Ask an admin to give you Pokeballs
@@ -30,14 +23,15 @@ Pokeball lets you “catch” a mob in a ball and “throw” it back out, just 
 ## How You Use It (Admins)
 
 - Get help: `/pokeball help` (shows only what you can use)
+- Show version: `/pokeball version`
 - Give balls to players: `/pokeball give <player> [amount]`
 - Reload config: `/pokeball reload`
 - Manage storage:
   - `/pokeball admin list` — see stored entries (first 20)
   - `/pokeball admin tp <id>` — teleport to a stored entry location (for inspection)
   - `/pokeball admin clean <id|all>` — remove one/all stored entries
-  - `/pokeball admin cap get|set <enabled> <max>` — view or change storage cap
-  - `/pokeball admin refund get|set <GIVE|DROP>` — set refund behavior (see below)
+  - `/pokeball admin cap [maxTotal]` — view current capacity or set new maximum capacity
+  - `/pokeball admin refund [mode]` — view current refund mode or set new mode (GIVE|DROP)
 
 Notes:
 - Commands are registered using Paper’s Brigadier API with typed arguments and tab-completion.
