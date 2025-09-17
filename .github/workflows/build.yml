@@ -36,8 +36,9 @@ jobs:
         run: |
           JAR=$(ls -1 target/Pokeball-*.jar | head -n 1)
           NAME=$(basename "$JAR")
+          NAME_NO_EXT="${NAME%.jar}"
           echo "jar=$JAR" >> "$GITHUB_OUTPUT"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME_NO_EXT" >> "$GITHUB_OUTPUT"
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
