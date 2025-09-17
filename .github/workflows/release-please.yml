@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,36 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Release Please
-        id: release
         uses: googleapis/release-please-action@v4
         with:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
-
-      - name: Checkout tag
-        if: ${{ steps.release.outputs.releases_created }}
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.release.outputs.tag_name }}
-          fetch-depth: 0
-
-      - name: Setup Java
-        if: ${{ steps.release.outputs.releases_created }}
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-
-      - name: Build JAR
-        if: ${{ steps.release.outputs.releases_created }}
-        run: mvn -B -ntp clean package
-
-      - name: Upload JAR to GitHub Release
-        if: ${{ steps.release.outputs.releases_created }}
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.release.outputs.tag_name }}
-          files: |
-            target/Pokeball-*.jar
-          fail_on_unmatched_files: true
+          token: ${{ secrets.ADMIN_TOKEN }}
