@@ -1,9 +1,29 @@
 # Pokeball — A Simple, Mob Catcher for MC Paper servers
 
-Pokeball lets you “catch” a mob in a ball and “throw” it back out, just like in Pokémon games.  
+Pokeball lets you "catch" a mob in a ball and "throw" it back out, just like in Pokémon games.  
 It's designed to be straightforward, reliable, fun — and simple to configure.
 
-Developer and tested for version 1.21.8
+Great for survival or adventure servers where you want players to transport mobs safely without leads or boats.
+
+Developed and tested for version 1.21.8
+
+## CI & Releases
+
+- Branch: `master`. Java 21 (Temurin). Maven build.
+- Build workflow: runs on push/PR to `master`, uploads the built jar as an artifact (kept 7 days). Artifact name matches
+  the jar name without the `.jar` suffix.
+- Release management: handled by release-please. Uses Conventional Commits to decide semver bumps. Config lives in `.github/release-please-config.json` and `.github/release-please-manifest.json`.
+- Release PRs: merging a release PR creates a tag `vX.Y.Z` and a GitHub Release. A separate release workflow builds from
+  the tag and attaches the jar to the Release.
+- Version bumps: release-please bumps both `pom.xml` and `src/main/resources/paper-plugin.yml` `version` in sync.
+- Snapshot PRs are disabled — only proper releases are proposed.
+
+How to cut a release
+
+- Use Conventional Commits in your merges to `master` (`feat`, `fix`).
+- Or force a version with an empty commit:
+    - `git commit --allow-empty -m "chore: release" -m "Release-As: 1.0.0" && git push origin master`
+- Merge the auto-opened release PR. The Release is created and the jar is attached automatically.
 
 ## What It Does
 
@@ -126,15 +146,15 @@ Notes:
       `config.yml`](src/main/resources/config.yml)).
 
 - Release placement
-    - When a wall is hit, the code probes outward along the impacted face for a few blocks to find “feet and head
-      passable” space (see `resolveImpactSpawn` in [
+    - When a wall is hit, the code probes outward along the impacted face for a few blocks to find "feet and head
+      passable" space (see `resolveImpactSpawn` in [
       `ProjectileListeners.java`](src/main/java/com/stdnullptr/pokeball/listener/ProjectileListeners.java)).
     - A small configurable offset is applied outward from the face and slightly up to avoid clipping (see [
       `config.yml`](src/main/resources/config.yml) `release.*`).
     - Wider mobs (spiders) get an extra lateral clearance check; otherwise the same universal rules apply (see
       `isSafeSpawn` in [
       `ProjectileListeners.java`](src/main/java/com/stdnullptr/pokeball/listener/ProjectileListeners.java)).
-    - If probing fails, it falls back to “just outside the block” placement; entity/air hits use the projectile
+    - If probing fails, it falls back to "just outside the block" placement; entity/air hits use the projectile
       location.
 
 - Stasis (what it is and why)
@@ -146,7 +166,7 @@ Notes:
         - For living entities, the plugin freezes and hides them: AI off, collidable off, invisible, invulnerable,
           silent, gravity off, not removed when far (see `park` in [
           `StasisService.java`](src/main/java/com/stdnullptr/pokeball/service/StasisService.java)).
-        - The entity is teleported to a configured “stash” location (world/x/y/z; default high Y), so it won't collide
+        - The entity is teleported to a configured "stash" location (world/x/y/z; default high Y), so it won't collide
           or be seen (see [
           `StasisConfig.java`](src/main/java/com/stdnullptr/pokeball/config/sections/StasisConfig.java)).
         - A lightweight mapping is written to `plugins/Pokeball/stasis.yml`:
