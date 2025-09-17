@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.0](https://github.com/stdNullPtr/Pokeball/compare/v1.0.0...v1.1.0) (2025-09-17)
+## [1.0.0](https://github.com/stdNullPtr/Pokeball/releases/tag/v1.0.0) (2025-09-17)
 
 
 ### Features
@@ -15,3 +15,8 @@
 
 * clarify refund mode live control command in README ([2292bc7](https://github.com/stdNullPtr/Pokeball/commit/2292bc7fcff85171cd0c27f7557affd49442fe0a))
 * update README usage and commands, remove redundant section ([53e8847](https://github.com/stdNullPtr/Pokeball/commit/53e884747e586d3e96f497d247944320b7dfc2f0))
+
+
+### Miscellaneous Chores
+
+* release ([7174522](https://github.com/stdNullPtr/Pokeball/commit/71745224306c33edd196d83428c563b5819232f1))
