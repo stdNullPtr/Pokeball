@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels: [ "dependencies" ]
+    groups:
+      maven-plugins:
+        patterns:
+          - "org.apache.maven.plugins:*"
+      papermc:
+        patterns:
+          - "io.papermc.paper:*"
+      lombok:
+        patterns:
+          - "org.projectlombok:*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:30"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels: [ "dependencies" ]
+    groups:
+      actions-core:
+        patterns:
+          - "actions/*"
+          - "google-github-actions/*"
+          - "softprops/action-gh-release"
+
