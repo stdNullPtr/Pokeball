@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0](https://github.com/stdNullPtr/Pokeball/compare/v1.1.0...v1.0.0) (2025-09-17)
+
+
+### Miscellaneous Chores
+
+* release ([7174522](https://github.com/stdNullPtr/Pokeball/commit/71745224306c33edd196d83428c563b5819232f1))
+
 ## [1.1.0](https://github.com/stdNullPtr/Pokeball/compare/v1.0.0...v1.1.0) (2025-09-17)
 
 
