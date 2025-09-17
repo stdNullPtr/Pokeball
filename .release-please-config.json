@@ -4,6 +4,8 @@
     ".": {
       "release-type": "maven",
       "package-name": "com.stdnullptr:Pokeball",
+      "component": "pokeball",
+      "include-component-in-tag": false,
       "extra-files": [
         {
           "type": "yaml",
@@ -14,4 +16,3 @@
     }
   }
 }
-
