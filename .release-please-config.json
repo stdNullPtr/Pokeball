@@ -5,6 +5,7 @@
       "release-type": "maven",
       "package-name": "com.stdnullptr:Pokeball",
       "component": "pokeball",
+      "skip-snapshot": true,
       "include-component-in-tag": false,
       "extra-files": [
         {
