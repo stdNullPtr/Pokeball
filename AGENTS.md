@@ -220,24 +220,8 @@ Don't:
 - Use NMS unless absolutely necessary (and only with paperweight + Gradle).
 - Mix legacy chat color codes with Components.
 
-## File Handling Discipline
-
-- Always inspect file encoding before editing. Use `(Get-Content path -Encoding Byte -TotalCount 3)` to detect a UTF-8
-  BOM (EF BB BF).
-- When writing files that started without a BOM, call
-  `[System.IO.File]::WriteAllText(path, content, (New-Object System.Text.UTF8Encoding($false)))` or
-  `Set-Content -Encoding utf8` to keep it that way.
-- Never mix `Add-Content` with pre-existing UTF-8 documents; rebuild the full text and overwrite instead so encoding
-  stays consistent.
-- Avoid non-ASCII punctuation (smart quotes, en/em dashes) unless the file already uses them intentionally. Convert them
-  to plain ASCII if they appear.
-- After edits, spot-check with `(Get-Content path)[0]` to ensure no mojibake (for example stray `??` or byte triples
-  such as `0xE2 0x80 0x93`). If you see that, undo and rewrite using ASCII-safe encoding.
-
 ## Agent Notes
 
 - Preserve existing file encoding when editing docs. `README.md` is UTF-8 (no BOM); avoid commands that add a BOM or
   re-encode punctuation.
-- Use `[System.IO.File]::WriteAllLines(path, lines, new System.Text.UTF8Encoding($false))` (or equivalent) so smart
-  quotes and dashes are not mangled.
 - Prefer plain ASCII in new text when feasible to avoid Windows console artifacts.
