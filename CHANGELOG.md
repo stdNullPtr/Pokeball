@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/stdNullPtr/Pokeball/compare/v1.0.0...v1.1.0) (2025-09-19)
+
+
+### Features
+
+* add capture allow-list management commands and enhanced suggestions ([4c1220c](https://github.com/stdNullPtr/Pokeball/commit/4c1220ce86b756348dbddc054f26fa6057e53460))
+
+
+### Documentation
+
+* remove redundant file handling discipline section from AGENTS.md ([5d0be64](https://github.com/stdNullPtr/Pokeball/commit/5d0be64f47994e50439749f1f367b9ea7fbcea02))
+
 ## [1.0.0](https://github.com/stdNullPtr/Pokeball/releases/tag/v1.0.0) (2025-09-17)
 
 
