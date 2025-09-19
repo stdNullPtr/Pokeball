@@ -81,7 +81,8 @@ public final class CommandTreeBuilder {
                 .then(buildTeleportCommand())
                 .then(buildCleanCommand())
                 .then(buildCapacityCommands())
-                .then(buildRefundCommands());
+                .then(buildRefundCommands())
+                .then(buildCaptureEntityCommands());
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> buildListCommand() {
@@ -121,5 +122,20 @@ public final class CommandTreeBuilder {
                                .argument("mode", StringArgumentType.word())
                                .suggests(suggestions.refundModes())
                                .executes(adminExecutor::handleRefund));
+    }
+
+    private LiteralArgumentBuilder<CommandSourceStack> buildCaptureEntityCommands() {
+        return Commands.literal("capture")
+                .executes(adminExecutor::showCaptureUsage)
+                .then(Commands.literal("list")
+                        .executes(adminExecutor::listAllowedCaptureTypes))
+                .then(Commands.literal("allow")
+                        .then(Commands.argument("entity", StringArgumentType.word())
+                                .suggests(suggestions.capturableEntitiesToAdd())
+                                .executes(adminExecutor::allowCaptureEntity)))
+                .then(Commands.literal("remove")
+                        .then(Commands.argument("entity", StringArgumentType.word())
+                                .suggests(suggestions.capturableEntitiesToRemove())
+                                .executes(adminExecutor::removeCaptureEntity)));
     }
 }

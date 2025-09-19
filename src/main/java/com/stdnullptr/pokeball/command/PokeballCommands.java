@@ -33,7 +33,7 @@ public final class PokeballCommands {
                   final var commands = event.registrar();
 
                   // Create all the executors and dependencies
-                  final var suggestions = new PokeballSuggestionProviders(plugin.stasis());
+                  final var suggestions = new PokeballSuggestionProviders(plugin.stasis(), config);
                   final var basicExecutor = new BasicCommandExecutor(plugin, config);
                   final var giveExecutor = new GiveCommandExecutor(plugin, config, itemFactory);
                   final var adminExecutor = new AdminCommandExecutor(plugin, config);

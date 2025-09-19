@@ -1,20 +1,33 @@
 package com.stdnullptr.pokeball.command.suggestion;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.stdnullptr.pokeball.config.ConfigManager;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.stdnullptr.pokeball.service.StasisService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Centralized suggestion providers for Pokeball commands
  */
 public final class PokeballSuggestionProviders {
 
-    private final StasisService stasisService;
+    private static final Set<EntityType> EXCLUDED_ENTITY_TYPES = EnumSet.of(EntityType.UNKNOWN);
 
-    public PokeballSuggestionProviders(final StasisService stasisService) {
+    private final StasisService stasisService;
+    private final ConfigManager config;
+
+    public PokeballSuggestionProviders(final StasisService stasisService, final ConfigManager config) {
         this.stasisService = stasisService;
+        this.config = config;
     }
 
     /**
@@ -75,5 +88,69 @@ public final class PokeballSuggestionProviders {
             builder.suggest("DROP");
             return builder.buildFuture();
         };
+    }
+
+    /**
+     * Suggests entity types that can be added to the capture allow-list.
+     */
+    public SuggestionProvider<CommandSourceStack> capturableEntitiesToAdd() {
+        return (ctx, builder) -> {
+            final Set<String> alreadyAllowed = config
+                    .capture()
+                    .allowedTypes()
+                    .stream()
+                    .map(EntityType::name)
+                    .collect(Collectors.toSet());
+
+            final List<String> candidates = sortedEntityTypes()
+                    .stream()
+                    .map(EntityType::name)
+                    .filter(name -> !alreadyAllowed.contains(name))
+                    .toList();
+
+            suggestMatching(candidates, builder);
+            return builder.buildFuture();
+        };
+    }
+
+    /**
+     * Suggests entity types currently present in the capture allow-list.
+     */
+    public SuggestionProvider<CommandSourceStack> capturableEntitiesToRemove() {
+        return (ctx, builder) -> {
+            final List<String> allowed = config
+                    .capture()
+                    .allowedTypes()
+                    .stream()
+                    .map(EntityType::name)
+                    .sorted()
+                    .toList();
+
+            suggestMatching(allowed, builder);
+            return builder.buildFuture();
+        };
+    }
+
+    private List<EntityType> sortedEntityTypes() {
+        final List<EntityType> types = new ArrayList<>();
+        for (final EntityType type : EntityType.values()) {
+            if (EXCLUDED_ENTITY_TYPES.contains(type)) {
+                continue;
+            }
+            types.add(type);
+        }
+        types.sort(Comparator.comparing(type -> type.name().toUpperCase(Locale.ENGLISH)));
+        return types;
+    }
+
+    private void suggestMatching(final List<String> candidates, final SuggestionsBuilder builder) {
+        final String remaining = builder.getRemainingLowerCase();
+
+        for (final String candidate : candidates) {
+            final String candidateLower = candidate.toLowerCase(Locale.ENGLISH);
+            if (remaining.isEmpty() || candidateLower.startsWith(remaining)) {
+                builder.suggest(candidate);
+            }
+        }
     }
 }

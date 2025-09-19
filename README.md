@@ -1,7 +1,7 @@
-# Pokeball — A Simple, Mob Catcher for MC Paper servers
+# Pokeball - A Simple, Mob Catcher for MC Paper servers
 
 Pokeball lets you "catch" a mob in a ball and "throw" it back out, just like in Pokémon games.  
-It's designed to be straightforward, reliable, fun — and simple to configure.
+It's designed to be straightforward, reliable, fun - and simple to configure.
 
 Great for survival or adventure servers where you want players to transport mobs safely without leads or boats.
 
@@ -16,7 +16,7 @@ Developed and tested for version 1.21.8
 - Release PRs: merging a release PR creates a tag `vX.Y.Z` and a GitHub Release. A separate release workflow builds from
   the tag and attaches the jar to the Release.
 - Version bumps: release-please bumps both `pom.xml` and `src/main/resources/paper-plugin.yml` `version` in sync.
-- Snapshot PRs are disabled — only proper releases are proposed.
+- Snapshot PRs are disabled - only proper releases are proposed.
 
 How to cut a release
 
@@ -34,7 +34,7 @@ How to cut a release
   - The mob appears right where the ball lands
   - If you throw at a wall, the plugin places the mob just outside the wall so it doesn't get stuck
 - Admins give balls to players; players just use them
-    - Normal players don't need special permissions — they only need balls
+    - Normal players don't need special permissions - they only need balls
 
 ## How You Use It (Players)
 
@@ -51,11 +51,15 @@ How to cut a release
 - Give balls to players: `/pokeball give <player> [amount]`
 - Reload config: `/pokeball reload`
 - Manage storage:
-  - `/pokeball admin list` — see stored entries (first 20)
-  - `/pokeball admin tp <id>` — teleport to a stored entry location (for inspection)
-  - `/pokeball admin clean <id|all>` — remove one/all stored entries
-  - `/pokeball admin cap [maxTotal]` — view current capacity or set new maximum capacity
-  - `/pokeball admin refund [mode]` — view current refund mode or set new mode (GIVE|DROP)
+  - `/pokeball admin list` - see stored entries (first 20)
+  - `/pokeball admin tp <id>` - teleport to a stored entry location (for inspection)
+  - `/pokeball admin clean <id|all>` - remove one/all stored entries
+  - `/pokeball admin cap [maxTotal]` - view current capacity or set new maximum capacity
+  - `/pokeball admin refund [mode]` - view current refund mode or set new mode (GIVE|DROP)
+- Tune capture allow-list live:
+    - `/pokeball admin capture list` - show the allowed entity types
+    - `/pokeball admin capture allow <entity>` - add an entity type to the allow-list
+    - `/pokeball admin capture remove <entity>` - remove an entity type (keeps at least one entry)
 
 Notes:
 
@@ -64,18 +68,21 @@ Notes:
 
 ## Commands
 
-| Command                            | Description                    | Permission              | Notes                                               |
-|------------------------------------|--------------------------------|-------------------------|-----------------------------------------------------|
-| `/pokeball`                        | Show contextual help           | —                       | Alias: `/pb`                                        |
-| `/pokeball help`                   | Show help                      | —                       |                                                     |
-| `/pokeball version`                | Show plugin version            | —                       | Reads plugin meta                                   |
-| `/pokeball reload`                 | Reload configuration           | `pokeball.admin.reload` |                                                     |
-| `/pokeball give <player> [amount]` | Give Pokeballs                 | `pokeball.admin.give`   | Player selector; amount 1–64; tab-suggested amounts |
-| `/pokeball admin list`             | List stasis entries (first 20) | `pokeball.admin`        | Shows id prefix + type                              |
-| `/pokeball admin tp <id>`          | Teleport to stasis location    | `pokeball.admin`        | Players only; tab-suggests IDs                      |
-| `/pokeball admin clean <id\|all>`  | Remove one or all entries      | `pokeball.admin`        | Tab-suggests IDs and `all`                          |
-| `/pokeball admin cap [maxTotal]`   | Show/set storage cap           | `pokeball.admin`        | 0 = unlimited; tab-suggests common limits           |
-| `/pokeball admin refund [mode]`    | Show/set refund mode           | `pokeball.admin`        | Modes: `GIVE`, `DROP`; tab-suggested                |
+| Command                                   | Description                           | Permission              | Notes                                               |
+|-------------------------------------------|---------------------------------------|-------------------------|-----------------------------------------------------|
+| `/pokeball`                               | Show contextual help                  | -                       | Alias: `/pb`                                        |
+| `/pokeball help`                          | Show help                             | -                       |                                                     |
+| `/pokeball version`                       | Show plugin version                   | -                       | Reads plugin meta                                   |
+| `/pokeball reload`                        | Reload configuration                  | `pokeball.admin.reload` |                                                     |
+| `/pokeball give <player> [amount]`        | Give Pokeballs                        | `pokeball.admin.give`   | Player selector; amount 1-64; tab-suggested amounts |
+| `/pokeball admin list`                    | List stasis entries (first 20)        | `pokeball.admin`        | Shows id prefix + type                              |
+| `/pokeball admin tp <id>`                 | Teleport to stasis location           | `pokeball.admin`        | Players only; tab-suggests IDs                      |
+| `/pokeball admin clean <id\|all>`         | Remove one or all entries             | `pokeball.admin`        | Tab-suggests IDs and `all`                          |
+| `/pokeball admin cap [maxTotal]`          | Show/set storage cap                  | `pokeball.admin`        | 0 = unlimited; tab-suggests common limits           |
+| `/pokeball admin refund [mode]`           | Show/set refund mode                  | `pokeball.admin`        | Modes: `GIVE`, `DROP`; tab-suggested                |
+| `/pokeball admin capture list`            | List allowed capture types            | `pokeball.admin`        | Tab-completion shows current values                 |
+| `/pokeball admin capture allow <entity>`  | Add a mob type to the allow-list      | `pokeball.admin`        | Suggests missing types; updates config              |
+| `/pokeball admin capture remove <entity>` | Remove a mob type from the allow-list | `pokeball.admin`        | Suggests allowed types; prevents removing all       |
 
 ## How it Works
 
@@ -83,13 +90,13 @@ Notes:
 
 - Throw empty ball to capture: if the hit mob is allowed and world‑allowed, the entity is parked in stasis, and you
   receive a filled ball linked to it; otherwise you get an empty ball back.
-- Throw filled ball to release: the ball’s ID rides the projectile; on impact the plugin finds a safe spot just outside
+- Throw filled ball to release: the ball's ID rides the projectile; on impact the plugin finds a safe spot just outside
   walls and teleports the stored mob there, then unfreezes it a tick later; optionally refunds an empty ball.
 - Stasis = real, hidden mob: captured entities are frozen, invisible, and moved to a stash location; a small record
   `{ballId -> world, entityUUID, chunkX/Z, type}` is saved and cleaned up on startup/death.
 - Projectiles are consumed on launch, never deal damage, and can show a configurable flight trail.
 - Config drives allowlist, worlds, effects, refund mode, and whether release consumes the ball; admin commands manage
-  storage cap and refund mode.
+  storage cap, capture allow-list, and refund mode.
 
 ### Detailed
 
@@ -190,7 +197,8 @@ Notes:
     - Refunds after misses/failures and post‑release are handled by GIVE (to inventory, drop on overflow) or DROP (
       always on ground) (see [`config.yml`](src/main/resources/config.yml) `refund.mode` and [
       `EffectsConfig.java`](src/main/java/com/stdnullptr/pokeball/config/sections/EffectsConfig.java)).
-    - A special capture permission can bypass the allowlist; admins can live‑tune storage cap and refund mode via
+  - A special capture permission can bypass the allowlist; admins can live‑tune storage cap, capture allow-list, and
+    refund mode via
       `/pokeball admin` (see [
       `AdminCommandExecutor.java`](src/main/java/com/stdnullptr/pokeball/command/executor/AdminCommandExecutor.java)).
 
@@ -198,7 +206,7 @@ Notes:
 
 - Throwing a ball shows a small, configurable trail
 - Capturing and releasing pop tasteful particles and sounds
-- Effects are configurable — you can make them subtle or flashy
+- Effects are configurable - you can make them subtle or flashy
 
 ## Sensible Defaults, Easy Controls
 
@@ -217,4 +225,4 @@ Notes:
 - Config key: `refund.mode: GIVE|DROP`
   - `GIVE`: tries to return balls to the player inventory; if full, drops at the impact location.
   - `DROP`: always drops balls at the impact location.
-- Live control (ops): `/pokeball admin refund [mode]` — view current mode or set new mode (GIVE|DROP)
+- Live control (ops): `/pokeball admin refund [mode]` - view current mode or set new mode (GIVE|DROP)

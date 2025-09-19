@@ -10,15 +10,21 @@ import com.stdnullptr.pokeball.config.models.RefundMode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
  * Executes admin subcommands for managing stasis entries and plugin configuration
  */
 public final class AdminCommandExecutor {
+
+    private static final String ALLOWED_ENTITY_TYPES_PATH = "capture.allowed-entity-types";
 
     private final Pokeball plugin;
 
@@ -35,7 +41,7 @@ public final class AdminCommandExecutor {
     public int showUsage(final CommandContext<CommandSourceStack> ctx) {
         ctx.getSource()
            .getSender()
-           .sendMessage(msg("<yellow>Usage:</yellow> /pokeball admin <list|tp|clean|cap|refund>"));
+           .sendMessage(msg("<yellow>Usage:</yellow> /pokeball admin <list|tp|clean|cap|refund|capture>"));
 
         return Command.SINGLE_SUCCESS;
     }
@@ -127,7 +133,7 @@ public final class AdminCommandExecutor {
     }
 
     /**
-     * Cleans stasis entries (specific ID or all)
+     * Removes a specific id or all ids from stasis storage
      */
     public int clean(final CommandContext<CommandSourceStack> ctx) {
         final var sender = ctx.getSource().getSender();
@@ -161,6 +167,123 @@ public final class AdminCommandExecutor {
         } catch (final IllegalArgumentException ex) {
             sender.sendMessage(msg("<red>Invalid UUID.</red>"));
             return 0;
+        }
+    }
+
+    // CAPTURE ALLOW-LIST COMMANDS
+
+    /**
+     * Shows capture allow-list usage
+     */
+    public int showCaptureUsage(final CommandContext<CommandSourceStack> ctx) {
+        ctx.getSource()
+           .getSender()
+           .sendMessage(msg("<yellow>Usage:</yellow> /pokeball admin capture <list|allow|remove>"));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    /**
+     * Lists currently allowed entity types for capture
+     */
+    public int listAllowedCaptureTypes(final CommandContext<CommandSourceStack> ctx) {
+        final var sender = ctx.getSource().getSender();
+        final var allowed = config.capture().allowedTypes();
+
+        if (allowed.isEmpty()) {
+            sender.sendMessage(msg("<red>No allowed entity types configured.</red>"));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        final List<String> names = allowed
+                .stream()
+                .map(EntityType::name)
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+
+        sender.sendMessage(msg("<gray>Allowed entities (" + names.size() + "): <green>" + String.join(", ", names) + "</green>"));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    /**
+     * Adds an entity type to the capture allow-list
+     */
+    public int allowCaptureEntity(final CommandContext<CommandSourceStack> ctx) {
+        final var sender = ctx.getSource().getSender();
+        final String rawInput = StringArgumentType.getString(ctx, "entity");
+        final EntityType type = resolveEntityType(rawInput);
+
+        if (type == null) {
+            sender.sendMessage(msg("<red>Invalid entity type:</red> <gray>" + rawInput + "</gray>"));
+            return 0;
+        }
+
+        final var conf = plugin.getConfig();
+        final List<String> allowed = new ArrayList<>(conf.getStringList(ALLOWED_ENTITY_TYPES_PATH));
+        final String typeName = type.name();
+
+        final boolean alreadyAllowed = allowed
+                .stream()
+                .anyMatch(existing -> existing.equalsIgnoreCase(typeName));
+        if (alreadyAllowed) {
+            sender.sendMessage(msg("<yellow>" + typeName + "</yellow> is already allowed."));
+            return 0;
+        }
+
+        allowed.add(typeName);
+        allowed.sort(String.CASE_INSENSITIVE_ORDER);
+        conf.set(ALLOWED_ENTITY_TYPES_PATH, allowed);
+        plugin.saveConfig();
+        config.reload();
+
+        sender.sendMessage(msg("<green>Added <yellow>" + typeName + "</yellow> to the capture allow-list.</green>"));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    /**
+     * Removes an entity type from the capture allow-list
+     */
+    public int removeCaptureEntity(final CommandContext<CommandSourceStack> ctx) {
+        final var sender = ctx.getSource().getSender();
+        final String rawInput = StringArgumentType.getString(ctx, "entity");
+        final EntityType type = resolveEntityType(rawInput);
+
+        if (type == null) {
+            sender.sendMessage(msg("<red>Invalid entity type:</red> <gray>" + rawInput + "</gray>"));
+            return 0;
+        }
+
+        final var conf = plugin.getConfig();
+        final List<String> allowed = new ArrayList<>(conf.getStringList(ALLOWED_ENTITY_TYPES_PATH));
+        final String typeName = type.name();
+
+        final boolean present = allowed
+                .stream()
+                .anyMatch(existing -> existing.equalsIgnoreCase(typeName));
+        if (!present) {
+            sender.sendMessage(msg("<red>" + typeName + " is not currently allowed.</red>"));
+            return 0;
+        }
+        if (allowed.size() <= 1) {
+            sender.sendMessage(msg("<red>Cannot remove the final allowed entity type.</red>"));
+            return 0;
+        }
+
+        allowed.removeIf(existing -> existing.equalsIgnoreCase(typeName));
+        allowed.sort(String.CASE_INSENSITIVE_ORDER);
+        conf.set(ALLOWED_ENTITY_TYPES_PATH, allowed);
+        plugin.saveConfig();
+        config.reload();
+
+        sender.sendMessage(msg("<green>Removed <yellow>" + typeName + "</yellow> from the capture allow-list.</green>"));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private EntityType resolveEntityType(final String rawInput) {
+        try {
+            final EntityType type = EntityType.valueOf(rawInput.toUpperCase(Locale.ENGLISH));
+            return type == EntityType.UNKNOWN ? null : type;
+        } catch (final IllegalArgumentException ex) {
+            return null;
         }
     }
 
