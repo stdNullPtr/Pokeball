@@ -7,24 +7,6 @@ Great for survival or adventure servers where you want players to transport mobs
 
 Developed and tested for version 1.21.8
 
-## CI & Releases
-
-- Branch: `master`. Java 21 (Temurin). Maven build.
-- Build workflow: runs on push/PR to `master`, uploads the built jar as an artifact (kept 7 days). Artifact name matches
-  the jar name without the `.jar` suffix.
-- Release management: handled by release-please. Uses Conventional Commits to decide semver bumps. Config lives in `.github/release-please-config.json` and `.github/release-please-manifest.json`.
-- Release PRs: merging a release PR creates a tag `vX.Y.Z` and a GitHub Release. A separate release workflow builds from
-  the tag and attaches the jar to the Release.
-- Version bumps: release-please bumps both `pom.xml` and `src/main/resources/paper-plugin.yml` `version` in sync.
-- Snapshot PRs are disabled - only proper releases are proposed.
-
-How to cut a release
-
-- Use Conventional Commits in your merges to `master` (`feat`, `fix`).
-- Or force a version with an empty commit:
-    - `git commit --allow-empty -m "chore: release" -m "Release-As: 1.0.0" && git push origin master`
-- Merge the auto-opened release PR. The Release is created and the jar is attached automatically.
-
 ## What It Does
 
 - Catch mobs by throwing a Pokeball at them
