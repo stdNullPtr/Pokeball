@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/stdNullPtr/Pokeball/compare/v1.2.0...v1.2.1) (2025-09-21)
+
+
+### Documentation
+
+* add download links section to README for easier access ([9096eb8](https://github.com/stdNullPtr/Pokeball/commit/9096eb88f524a78c059fdb9a4631d02574f85c6c))
+
 ## [1.2.0](https://github.com/stdNullPtr/Pokeball/compare/v1.1.0...v1.2.0) (2025-09-21)
 
 
