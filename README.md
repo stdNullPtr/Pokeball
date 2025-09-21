@@ -16,6 +16,15 @@ Built against Paper API 1.21.8 (Minecraft 1.21.x)
     - Wall hits are adjusted so the mob spawns just outside the wall.
 - Admins give balls to players; players just use them - no extra permissions needed for normal use.
 
+## Screenshots
+<img width="1135" height="265" alt="image" src="https://github.com/user-attachments/assets/7042c09f-de90-428c-b089-59ef9d925a43" />
+<img width="1002" height="195" alt="image" src="https://github.com/user-attachments/assets/32876d16-da30-4cb3-8ff8-e0e14e294836" />
+When you capture a creature with the 'special' permissions, bypassing the allowlist:
+<img width="999" height="208" alt="image" src="https://github.com/user-attachments/assets/88fb2648-f089-446d-9ae7-928283200d3d" />
+
+See it in action:
+https://github.com/user-attachments/assets/ff69137f-0903-4fe2-8e1a-fa4adb28f12a
+
 ## Requirements
 
 - Paper 1.21.x
