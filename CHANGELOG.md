@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/stdNullPtr/Pokeball/compare/v1.1.0...v1.2.0) (2025-09-21)
+
+
+### Features
+
+* gate release by world + tidy README & config ([#14](https://github.com/stdNullPtr/Pokeball/issues/14)) ([ef380b9](https://github.com/stdNullPtr/Pokeball/commit/ef380b9d57cbc96566a5b6683837c22e39441995))
+
+
+### Documentation
+
+* remove outdated CI and release workflow section from README ([77c964d](https://github.com/stdNullPtr/Pokeball/commit/77c964db3efc286b999188ffb48201c6e67abf2e))
+
 ## [1.1.0](https://github.com/stdNullPtr/Pokeball/compare/v1.0.0...v1.1.0) (2025-09-19)
 
 
