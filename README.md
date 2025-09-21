@@ -23,7 +23,7 @@ When you capture a creature with the 'special' permissions, bypassing the allowl
 <img width="999" height="208" alt="image" src="https://github.com/user-attachments/assets/88fb2648-f089-446d-9ae7-928283200d3d" />
 
 See it in action:
-https://github.com/user-attachments/assets/ff69137f-0903-4fe2-8e1a-fa4adb28f12a
+![Catching a mob](https://github.com/user-attachments/assets/ff69137f-0903-4fe2-8e1a-fa4adb28f12a)
 
 ## Requirements
 
