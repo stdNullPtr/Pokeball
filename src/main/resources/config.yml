@@ -41,13 +41,6 @@ special-capture:
 compat:
   worlds: []
 
-# Permissions (documented; enforcement in code)
-permissions:
-  use-capture: pokeball.use.capture
-  use-release: pokeball.use.release
-  admin-give: pokeball.admin.give
-  admin-reload: pokeball.admin.reload
-
 # Messages (MiniMessage)
 messages:
   prefix: "<gray>[<yellow>Pokeball</yellow>]"
@@ -56,7 +49,6 @@ messages:
   capture-fail-player: "<yellow>Really?</yellow>"
   capture-fail-world: "<red>Capturing is not allowed in this world."
   release-success: "<green>Released a <yellow><type></yellow>."
-  release-fail-permission: "<red>You lack permission to release."
   release-fail-world: "<red>Releasing is not allowed in this world."
   given: "<green>Gave <yellow><count></yellow> Pokeball(s) to <yellow><player></yellow>."
   reloaded: "<green>Configuration reloaded."

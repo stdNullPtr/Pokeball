@@ -163,6 +163,20 @@ public final class ProjectileListeners implements Listener {
                     .stasis()
                     .peekType(ballId);
             final Location spawnAt = resolveImpactSpawn(event, proj, mobType);
+            if (!worldAllowed(spawnAt.getWorld().getName())) {
+                final String releaseWorldMsg = cfg.messages().getReleaseFailWorld();
+                player.sendMessage(msg(cfg.messages().getPrefix() + " " +
+                                               (releaseWorldMsg != null ? releaseWorldMsg : "<red>Releasing is not allowed in this world.</red>")));
+                // Refund the filled ball linked to this stasis entry
+                if (mobType != null) {
+                    giveOrDrop(player, items.createFilledBall(ballId, mobType, false, null), spawnAt);
+                } else {
+                    // Fallback: return empty ball if type cannot be determined
+                    giveOrDrop(player, items.createEmptyBall(), spawnAt);
+                }
+                proj.remove();
+                return;
+            }
             // Impact flash
             try {
                 spawnAt
@@ -271,7 +285,7 @@ public final class ProjectileListeners implements Listener {
             // Wider mobs like spiders need extra lateral clearance
             final boolean wide = (mobType == EntityType.SPIDER || mobType == EntityType.CAVE_SPIDER);
             if (!wide) return true;
-            // Check cardinal neighbors as well for 2x2 passable area
+            // Check cardinal neighbors for 2x2 passable area
             final Block[] neighbors = {block.getRelative(BlockFace.NORTH), block.getRelative(BlockFace.SOUTH), block.getRelative(
                     BlockFace.EAST), block.getRelative(BlockFace.WEST)
             };

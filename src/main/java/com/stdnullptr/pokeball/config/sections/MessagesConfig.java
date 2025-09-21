@@ -21,6 +21,8 @@ public final class MessagesConfig {
 
     private final String releaseSuccess;
 
+    private final String releaseFailWorld;
+
     private final String given;
 
     private final String reloaded;
@@ -44,6 +46,10 @@ public final class MessagesConfig {
                 "messages.release-success",
                 "<green>Released a <yellow><type></yellow>."
         );
+        this.releaseFailWorld = config.getString(
+                "messages.release-fail-world",
+                "<red>Releasing is not allowed in this world."
+        );
         this.given = config.getString(
                 "messages.given",
                 "<green>Gave <yellow><count></yellow> Pokeball(s) to <yellow><player></yellow>."
@@ -56,6 +62,7 @@ public final class MessagesConfig {
         validateMessage("messages.capture-fail-player", this.captureFailPlayer);
         validateMessage("messages.capture-fail-world", this.captureFailWorld);
         validateMessage("messages.release-success", this.releaseSuccess);
+        validateMessage("messages.release-fail-world", this.releaseFailWorld);
         validateMessage("messages.given", this.given);
         validateMessage("messages.reloaded", this.reloaded);
     }
