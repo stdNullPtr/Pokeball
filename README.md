@@ -6,6 +6,12 @@ mobs without leads or boats.
 
 Built against Paper API 1.21.8 (Minecraft 1.21.x)
 
+## Get It
+
+- Spigot resource: https://www.spigotmc.org/resources/pokeball.128981/
+- GitHub releases: https://github.com/stdNullPtr/Pokeball/releases
+- Hangar: https://hangar.papermc.io/stdNullPtr/Pokeball
+
 ## What It Does
 
 - Catch mobs by throwing a Pokeball at them.
