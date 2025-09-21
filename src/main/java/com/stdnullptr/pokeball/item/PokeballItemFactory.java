@@ -32,7 +32,7 @@ public final class PokeballItemFactory {
     }
 
     public ItemStack createEmptyBall() {
-        final ItemStack item = new ItemStack(Material.SNOWBALL, 1); // placeholder item
+        final ItemStack item = new ItemStack(Material.SNOWBALL, 1);
         final ItemMeta meta = item.getItemMeta();
         applyCommonMeta(
                 meta,
@@ -104,6 +104,27 @@ public final class PokeballItemFactory {
                 (bypass && bypassAnnotation != null) ? bypassAnnotation : null
         );
         stack.setItemMeta(meta);
+    }
+
+    /**
+     * Creates a filled Pokeball item bound to an existing ball id and captured type.
+     * Used to refund the original filled ball on release failure without changing linkage.
+     */
+    public ItemStack createFilledBall(final UUID ballId, final EntityType type, final boolean bypass, final String bypassAnnotation) {
+        final ItemStack item = new ItemStack(Material.SNOWBALL, 1);
+        final ItemMeta meta = item.getItemMeta();
+        applyCommonMeta(meta,
+                        cfg.items().name(),
+                        cfg.items().lore(),
+                        type,
+                        (bypass && bypassAnnotation != null) ? bypassAnnotation : null
+        );
+        final PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(keys.getBallId(), PersistentDataType.STRING, ballId.toString());
+        pdc.set(keys.getCapturedType(), PersistentDataType.STRING, type.name());
+        pdc.set(keys.getCapturedDataVersion(), PersistentDataType.INTEGER, 1);
+        item.setItemMeta(meta);
+        return item;
     }
 
     private void applyCommonMeta(final ItemMeta meta, final String name, final List<String> lore) {
