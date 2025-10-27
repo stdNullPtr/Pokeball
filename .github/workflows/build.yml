@@ -41,7 +41,7 @@ jobs:
           echo "name=$NAME_NO_EXT" >> "$GITHUB_OUTPUT"
 
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.meta.outputs.name }}
           path: ${{ steps.meta.outputs.jar }}
