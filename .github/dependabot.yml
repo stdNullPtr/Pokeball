@@ -1,6 +1,6 @@
 version: 2
 updates:
-  - package-ecosystem: "maven"
+  - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "daily"
@@ -9,15 +9,16 @@ updates:
     open-pull-requests-limit: 10
     labels: [ "dependencies" ]
     groups:
-      maven-plugins:
+      gradle-plugins:
         patterns:
-          - "org.apache.maven.plugins:*"
+          - "xyz.jpenilla.run-paper*"
+          - "org.gradle.toolchains.foojay-resolver*"
       papermc:
         patterns:
           - "io.papermc.paper:*"
       lombok:
         patterns:
-          - "org.projectlombok:*"
+          - "io.freefair.lombok*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -32,5 +33,6 @@ updates:
         patterns:
           - "actions/*"
           - "google-github-actions/*"
+          - "gradle/actions"
           - "softprops/action-gh-release"
 

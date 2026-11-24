@@ -25,16 +25,18 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: maven
 
-      - name: Build with Maven
-        run: mvn -B -ntp package
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Compute artifact name
         id: meta
         shell: bash
         run: |
-          JAR=$(ls -1 target/Pokeball-*.jar | head -n 1)
+          JAR=$(ls -1 build/libs/Pokeball-*.jar | head -n 1)
           NAME=$(basename "$JAR")
           NAME_NO_EXT="${NAME%.jar}"
           echo "jar=$JAR" >> "$GITHUB_OUTPUT"

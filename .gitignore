@@ -1,4 +1,7 @@
 *.iml
 .idea
-target/
+build/
+.gradle/
+.kotlin/
+run/
 tmp_*.html

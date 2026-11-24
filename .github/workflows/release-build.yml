@@ -25,17 +25,21 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: maven
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: true
 
       - name: Build JAR
-        run: mvn -B -ntp clean package
+        run: ./gradlew clean build
 
       - name: Attach JAR to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
-            target/Pokeball-*.jar
+            build/libs/Pokeball-*.jar
           fail_on_unmatched_files: true
           overwrite_files: true
           token: ${{ secrets.ADMIN_TOKEN }}
