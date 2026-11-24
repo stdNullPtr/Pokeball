@@ -2,19 +2,16 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
     ".": {
-      "release-type": "maven",
-      "package-name": "com.stdnullptr:Pokeball",
+      "release-type": "simple",
+      "package-name": "Pokeball",
       "component": "pokeball",
-      "skip-snapshot": true,
       "include-component-in-tag": false,
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "src/main/resources/paper-plugin.yml",
-          "jsonpath": "$.version"
+          "type": "generic",
+          "path": "gradle.properties"
         }
       ]
     }
   }
 }
-

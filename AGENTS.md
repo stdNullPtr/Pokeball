@@ -9,10 +9,10 @@ Scope: This file applies to the entire repository.
 
 - Type: Paper plugin
 - Language/Runtime: Java 21 (LTS)
-- Build: Maven (shade configured; runtime libs provided via Paper `libraries:`)
+- Build: Gradle (Kotlin DSL, wrapper, toolchains), `run-paper` for local test servers
 - Entry: `com.stdnullptr.pokeball.Pokeball`
 - Plugin meta: `src/main/resources/paper-plugin.yml` (Paper metadata only)
-- API target: Paper 1.21.x (`api-version: 1.21`)
+- API target: paper-api 1.21.11 (`api-version: 1.21`); runs on Paper 1.21.x and 26.x
 
 ## Goals and Philosophy
 
@@ -25,8 +25,11 @@ Scope: This file applies to the entire repository.
 
 ## Build & Run
 
-- Build: `mvn -q -DskipTests package`
-- Output: `target/Pokeball-<version>.jar`
+- Build: `./gradlew build`
+- Output: `build/libs/Pokeball-<version>.jar`
+- Run: `./gradlew runServer` (Paper 26.3) or `./gradlew runServerOldest` (Paper 1.21.11); server files in `run/`.
+- Version: `gradle.properties` is the single source; `paper-plugin.yml` gets it at build time and
+  release-please bumps it.
 - Deploy: drop the jar into your server's `plugins/` folder.
 
 ## Repository Conventions (IMPORTANT)

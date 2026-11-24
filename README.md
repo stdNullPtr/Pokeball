@@ -4,7 +4,7 @@ Pokeball lets you catch a mob in a ball and throw it back out, just like in Pok√
 straightforward, reliable, and easy to configure - great for survival or adventure servers where players need to move
 mobs without leads or boats.
 
-Built against Paper API 1.21.8 (Minecraft 1.21.x)
+Built against Paper API 1.21.11; runs on Paper 1.21.x and 26.x (tested on 1.21.11 and 26.3)
 
 ## Get It
 
@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/ff69137f-0903-4fe2-8e1a-fa4adb28f12a
 
 ## Requirements
 
-- Paper 1.21.x
+- Paper 1.21.x or 26.x (tested on 1.21.11 and 26.3)
 - Java 21 (LTS)
 - Folia: not currently supported (`folia-supported: false` in `paper-plugin.yml`:9)
 
@@ -114,7 +114,7 @@ https://github.com/user-attachments/assets/ff69137f-0903-4fe2-8e1a-fa4adb28f12a
 
 ## Compatibility
 
-- Paper 1.21.x (api-version `1.21`).
+- Paper 1.21.x and 26.x (api-version `1.21`).
 - Folia: not currently supported (`folia-supported: false`).
 - No NMS; uses modern Paper APIs and Adventure Components.
 
@@ -226,8 +226,15 @@ https://github.com/user-attachments/assets/ff69137f-0903-4fe2-8e1a-fa4adb28f12a
 
 ## Build From Source
 
-- Build: `mvn -q -DskipTests package`
-- Output: `target/Pokeball-<version>.jar`
+No local JDK or Gradle install needed: the wrapper downloads Gradle, and Gradle downloads the JDKs it needs.
+
+- Build: `./gradlew build` (Windows: `gradlew.bat build`)
+- Output: `build/libs/Pokeball-<version>.jar`
+- Test server: `./gradlew runServer` starts Paper 26.3 in `run/26.3` with the plugin installed;
+  `./gradlew runServerOldest` does the same on Paper 1.21.11. Accept the EULA in that folder's
+  `eula.txt` on first run, then join `localhost`.
+- Hotswap: run either task in IntelliJ's debugger, edit code, then Run > Debugging Actions > Reload
+  Changed Classes. The servers run on the JetBrains Runtime, so new methods and fields hotswap too.
 
 ## License
 
